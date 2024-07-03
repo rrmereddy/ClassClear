@@ -1,8 +1,18 @@
-# React + Vite
+# Syllabus Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack project using React, Vite, Tailwind CSS, and an Express backend.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Before you begin, ensure you have met the following requirements:
+- Node.js and npm installed. You can download them from [Node.js](https://nodejs.org/).
+
+## Getting Started
+
+### Clone the Repository
+
+Clone the project repository:
+
+```bash
+git clone https://github.com/your-username/syllabus-project.git
+cd syllabus-project
