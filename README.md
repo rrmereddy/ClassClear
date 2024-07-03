@@ -11,8 +11,13 @@ Before you begin, ensure you have met the following requirements:
 
 ### Clone the Repository
 
-Clone the project repository:
-
 ```bash
 git clone https://github.com/your-username/syllabus-project.git
 cd syllabus-project
+```
+
+# Install the Dependencies
+```bash
+npm install
+npm install axios cors express nodemon
+```
