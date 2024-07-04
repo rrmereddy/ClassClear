@@ -1,26 +1,21 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import SignUp from './components/SignUp';
+import Login from './components/Login';
+import Landing from './components/Landing';
+
 
 function App() {
-  const [message, setMessage] = useState(null);
-
-  useEffect(() => {
-    axios.get('http://localhost:5000/api/data')
-      .then(response => {
-        setMessage(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching message:', error);
-      });
-  }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>React App with Backend</h1>
-        {message ? <p>{message}</p> : <p>Loading...</p>}
-      </header>
-    </div>
+    <main >
+      <Router>
+        <Routes>
+        <Route path='/' element={<Landing />} />
+          <Route path='/signup' element={<SignUp />} />
+          <Route path='/login' element={<Login />} />
+        </Routes>
+      </Router>
+    </main>
   );
 }
 
