@@ -4,6 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 * {
   margin: 0;
   padding: 0;
@@ -18,22 +20,33 @@ body {
   background: linear-gradient(145deg, #0e0e0e, #1a1a1a);
 }
 
-.glass{
+.glass {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
   backdrop-filter: blur(10px);
   border-radius: 20px;
-  border:1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 2px solid rgba(255, 255, 255, 0.18);
 }
 
 
-
-
 @layer utilities{
+  .center{
+    @apply flex items-center justify-center;
+  }
+
+  .ls-container{
+    @apply md:w-96 md:p-6 sm:w-80 sm:p-4 min-w-60 p-4 rounded-lg shadow-lg;
+  }
+  .ls-h1{
+    @apply text-2xl font-semibold text-white text-center;
+  }
+  .ls-label{
+    @apply block text-sm font-medium text-white;
+  }
   .ls-info{
     @apply mt-1 block w-full px-3 py-2 border rounded-lg text-white/80 bg-transparent focus:outline-none  focus:border-amber-500 sm:text-sm;
   }
   .ls-btn{
-    @apply w-3/5 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-zinc-700 hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500;
+    @apply w-3/5 py-2 px-4 border border-white/80 rounded-md text-sm font-medium text-white bg-transparent hover:bg-amber-500 hover:border-gray-800 transition duration-200 ease-in-out; ;
   }
+
 }

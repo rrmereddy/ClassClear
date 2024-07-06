@@ -3,14 +3,13 @@ import SignUp from './components/SignUp';
 import Login from './components/Login';
 import Landing from './components/Landing';
 
-
 function App() {
 
   return (
     <main >
       <Router>
         <Routes>
-        <Route path='/' element={<Landing />} />
+          <Route path='/' element={<Landing />} />
           <Route path='/signup' element={<SignUp />} />
           <Route path='/login' element={<Login />} />
         </Routes>
