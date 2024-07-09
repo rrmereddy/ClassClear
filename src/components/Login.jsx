@@ -73,13 +73,14 @@ const Login = () => {
             </div>
           </div>
           <div className="center">
-            <button type="submit" className="ls-btn">
+            <button type="submit" className="ls-btn absolute mt-1">
               Login
               <FontAwesomeIcon icon={faSignIn} className="ml-2" />
             </button>
+            <a href="/forgot-password" className="relative bottom-6 md:left-[105px] left-[70px] mt-2 mb-8 text-sm  text-amber-500 hover:text-amber-700">Forgot Password?</a>
           </div>
         </form>
-        <div className="flex items-center mt-2">
+        <div className="flex items-center mt-1">
           <div className="flex-grow border-t border-amber-500"></div>
           <span className="mx-2 text-amber-500">OR</span>
           <div className="flex-grow border-t border-amber-500"></div>
