@@ -4,8 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 * {
   margin: 0;
   padding: 0;
@@ -27,26 +25,46 @@ body {
   border: 2px solid rgba(255, 255, 255, 0.18);
 }
 
-
-@layer utilities{
-  .center{
+@layer utilities {
+  .center {
     @apply flex items-center justify-center;
   }
 
-  .ls-container{
+  .ls-container {
     @apply md:w-96 md:p-6 sm:w-80 sm:p-4 min-w-60 p-4 rounded-lg shadow-lg;
   }
-  .ls-h1{
-    @apply text-2xl font-semibold text-white text-center;
-  }
-  .ls-label{
-    @apply block text-sm font-medium text-white;
-  }
-  .ls-info{
-    @apply mt-1 block w-full px-3 py-2 border rounded-lg text-white/80 bg-transparent focus:outline-none  focus:border-amber-500 sm:text-sm;
-  }
-  .ls-btn{
-    @apply w-1/2 py-2 px-4 border border-white/80 rounded-md text-sm font-medium text-white bg-transparent hover:bg-amber-500 hover:border-gray-800 transition duration-200 ease-in-out; ;
+
+  .ls-h1 {
+    @apply text-2xl font-semibold text-primary_color text-center;
   }
 
+  .ls-label {
+    @apply block text-sm font-medium text-white;
+  }
+
+  .ls-info {
+    @apply mt-1 block w-full px-3 py-2 border rounded-lg text-primary_color bg-transparent focus:outline-none focus:border-secondary_color sm:text-sm;
+  }
+
+  .ls-btn {
+    @apply w-1/2 py-2 px-4 border border-primary_color text-primary_color rounded-md text-sm font-medium text-white bg-transparent hover:bg-secondary_color hover:border-gray-800 transition duration-200 ease-in-out;
+  }
+
+  .card-wrapper {
+    @apply relative bg-gradient-to-b from-zinc-700 to-zinc-800 rounded-xl overflow-hidden;
+  }
+
+  .card-wrapper::before {
+    background: conic-gradient(
+      rgb(245, 158, 11) 0deg,
+      rgb(194, 123, 0) 0deg,
+      transparent 40deg
+      );
+
+    @apply absolute size-[400%] content-[''] animate-border-spin;
+  }
+
+  .card-content{
+    @apply absolute size-[calc(100%-2px)] bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-xl;
+  }
 }

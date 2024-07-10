@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faApple, faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import PasswordStrength, { calculatePasswordStrength } from './PasswordStrength';
+import PasswordStrength, { calculatePasswordStrength } from '../components/PasswordStrength';
 
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -90,27 +90,27 @@ const SignUp = () => {
           </div>
         </form>
         <div className="flex items-center mt-2">
-          <div className="flex-grow border-t border-amber-500"></div>
-          <span className="mx-2 text-amber-500">OR</span>
-          <div className="flex-grow border-t border-amber-500"></div>
+          <div className="flex-grow border-t border-secondary_color"></div>
+          <span className="mx-2 text-secondary_color">OR</span>
+          <div className="flex-grow border-t border-secondary_color"></div>
         </div>
         <div className="center flex-col p-1">
           <span className="text-white">Continue with</span>
           <div className="flex space-x-4 mt-1">
-            <button className="hover:text-amber-500">
+            <button className="hover:text-secondary_color">
               <FontAwesomeIcon icon={faApple} style={{ fontSize: '28px' }}/>
             </button>
-            <button className="hover:text-amber-500">
+            <button className="hover:text-secondary_color">
               <FontAwesomeIcon icon={faGoogle} style={{ fontSize: '25px' }}/>
             </button>
-            <button className="hover:text-amber-500">
+            <button className="hover:text-secondary_color">
               <FontAwesomeIcon icon={faGithub} style={{ fontSize: '25px' }}/>
             </button>
           </div>
         </div>
         <div className="center mt-2">
           <p className="text-white">Already have an account?</p>
-          <a href="/login" className="text-amber-500 hover:text-amber-700 px-1">Login</a>
+          <a href="/login" className="text-secondary_color hover:text-amber-700 px-1">Login</a>
         </div>
       </div>
     </div>
