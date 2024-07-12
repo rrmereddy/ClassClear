@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faApple, faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import PasswordStrength, { calculatePasswordStrength } from '../components/PasswordStrength';
-
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -12,6 +13,7 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -22,13 +24,34 @@ const SignUp = () => {
     setEmail(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const passwordStrength = calculatePasswordStrength(password);
     if (passwordStrength < 4) {
       setError('Please choose a stronger password.');
       return;
     }
+    try {
+      const response = await fetch('http://localhost:5001/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        console.log('Signup successful');
+        navigate('/');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Signup failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setError('An error occurred. Please try again.');
+    }
+
     console.log('Form submitted', { email, password });
   }
 

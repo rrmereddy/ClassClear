@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faApple, faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -10,19 +11,38 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
+    setError('');
   };
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted', { email, password });
-  }
+    const response = await fetch('http://localhost:5001/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+  
+    const data = await response.json();
+  
+    if (response.ok) {
+      console.log('Login successful');
+      navigate("/")
+    } else {
+      console.error('Login failed:', data.message);
+      setError(data.message);
+    }
+  };
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -72,6 +92,7 @@ const Login = () => {
               </button>
             </div>
           </div>
+          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           <div className="center">
             <button type="submit" className="ls-btn absolute mt-1">
               Login
