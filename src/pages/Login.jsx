@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faApple, faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faApple, faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -42,6 +41,12 @@ const Login = () => {
       console.error('Login failed:', data.message);
       setError(data.message);
     }
+  };
+
+  const handleAuth = (event) => {
+    const buttonId = event.currentTarget.id;
+    const form = event.currentTarget.closest('form');
+    form.action = buttonId === 'apple' ? '/auth/apple' : '/auth/google';
   };
 
   const toggleShowPassword = () => {
@@ -98,7 +103,7 @@ const Login = () => {
               Login
               <FontAwesomeIcon icon={faSignIn} className="ml-2" />
             </button>
-            <a href="/forgot-password" className="relative bottom-6 md:left-[105px] left-[70px] mt-2 mb-8 text-sm  text-amber-500 hover:text-amber-700">Forgot Password?</a>
+            <a href="/login/forgot-password" className="relative bottom-6 md:left-[105px] left-[70px] mt-2 mb-8 text-sm  text-amber-500 hover:text-amber-700">Forgot Password?</a>
           </div>
         </form>
         <div className="flex items-center mt-1">
@@ -106,20 +111,29 @@ const Login = () => {
           <span className="mx-2 text-secondary_color">OR</span>
           <div className="flex-grow border-t border-secondary_color"></div>
         </div>
-        <div className="center flex-col p-1">
-          <span className="text-white">Continue with</span>
-          <div className="flex space-x-4 mt-1">
-            <button className="hover:text-secondary_color">
-              <FontAwesomeIcon icon={faApple} style={{ fontSize: '28px' }}/>
-            </button>
-            <button className="hover:text-secondary_color">
-              <FontAwesomeIcon icon={faGoogle} style={{ fontSize: '25px' }}/>
-            </button>
-            <button className="hover:text-secondary_color">
-              <FontAwesomeIcon icon={faGithub} style={{ fontSize: '25px' }}/>
-            </button>
+        <form>
+          <div className="center flex-col p-1">
+            <span className="text-white">Login with</span>
+            <div className="flex mt-1">
+              <button
+                id='apple'
+                type='submit'
+                className="border border-white/80 px-2 py-1 rounded-lg hover:border-secondary_color mr-2"
+                onClick={handleAuth}
+              >
+                <FontAwesomeIcon icon={faApple} style={{ fontSize: '30px' }} />
+              </button>
+              <button
+                id='google'
+                type='submit'
+                className="center border border-white/80 px-2 py-1 rounded-lg hover:border-secondary_color"
+                onClick={handleAuth}
+              >
+                <FontAwesomeIcon icon={faGoogle} style={{ fontSize: '25px' }} />
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
         <div className="center mt-2">
           <p className="text-white">Don&apos;t have an account?</p>
           <a href="/signup" className="text-secondary_color hover:text-amber-700 px-1">Sign Up</a>

@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faApple, faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faApple, faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import PasswordStrength, { calculatePasswordStrength } from '../components/PasswordStrength';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -54,6 +53,12 @@ const SignUp = () => {
 
     console.log('Form submitted', { email, password });
   }
+
+  const handleAuth = (event) => {
+    const buttonId = event.currentTarget.id;
+    const form = event.currentTarget.closest('form');
+    form.action = buttonId === 'apple' ? '/auth/apple' : '/auth/google';
+  };
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -117,20 +122,29 @@ const SignUp = () => {
           <span className="mx-2 text-secondary_color">OR</span>
           <div className="flex-grow border-t border-secondary_color"></div>
         </div>
-        <div className="center flex-col p-1">
-          <span className="text-white">Continue with</span>
-          <div className="flex space-x-4 mt-1">
-            <button className="hover:text-secondary_color">
-              <FontAwesomeIcon icon={faApple} style={{ fontSize: '28px' }}/>
-            </button>
-            <button className="hover:text-secondary_color">
-              <FontAwesomeIcon icon={faGoogle} style={{ fontSize: '25px' }}/>
-            </button>
-            <button className="hover:text-secondary_color">
-              <FontAwesomeIcon icon={faGithub} style={{ fontSize: '25px' }}/>
-            </button>
+        <form>
+          <div className="center flex-col p-1">
+            <span className="text-white">Sign Up with</span>
+            <div className="flex mt-1">
+              <button
+                id='apple'
+                type='submit'
+                className="border border-white/80 px-2 py-1 rounded-lg hover:border-secondary_color mr-2"
+                onClick={handleAuth}
+              >
+                <FontAwesomeIcon icon={faApple} style={{ fontSize: '30px' }} />
+              </button>
+              <button
+                id='google'
+                type='submit'
+                className="center border border-white/80 px-2 py-1 rounded-lg hover:border-secondary_color"
+                onClick={handleAuth}
+              >
+                <FontAwesomeIcon icon={faGoogle} style={{ fontSize: '25px' }} />
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
         <div className="center mt-2">
           <p className="text-white">Already have an account?</p>
           <a href="/login" className="text-secondary_color hover:text-amber-700 px-1">Login</a>
