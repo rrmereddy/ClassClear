@@ -43,14 +43,6 @@ app.use(express.static("public"));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get("/", (req, res) => {
-  res.send("Hello from the backend!");
-});
-
-app.get("/api/data", (req, res) => {
-  res.json("This is data from the backend");
-});
-
 app.post("/login", (req, res) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
