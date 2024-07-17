@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faApple, faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { faApple, faGoogle, faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import PasswordStrength, { calculatePasswordStrength } from '../components/PasswordStrength';
 import { useNavigate } from 'react-router-dom';
@@ -54,10 +54,28 @@ const SignUp = () => {
     console.log('Form submitted', { email, password });
   }
 
-  const handleAuth = (event) => {
-    const buttonId = event.currentTarget.id;
-    const form = event.currentTarget.closest('form');
-    form.action = buttonId === 'apple' ? '/auth/apple' : '/auth/google';
+  const handleAuth = (e) => {
+    e.preventDefault();
+    const buttonId = e.currentTarget.id;
+    const authUrl = buttonId === 'discord' 
+      ? 'http://localhost:5001/auth/discord' 
+      : 'http://localhost:5001/auth/google';
+    
+    const authWindow = window.open(authUrl, '_blank', 'width=500,height=600');
+    
+    window.addEventListener('message', (event) => {
+      if (event.origin !== 'http://localhost:5001') return;
+      
+      if (event.data.type === 'AUTH_SUCCESS') {
+        console.log('Authentication successful');
+        authWindow.close();
+        navigate("/");
+      } else if (event.data.type === 'AUTH_FAILURE') {
+        console.log('Authentication failed');
+        setError('Authentication failed')
+        authWindow.close();
+      }
+    }, false);
   };
 
   const toggleShowPassword = () => {
@@ -127,12 +145,12 @@ const SignUp = () => {
             <span className="text-white">Sign Up with</span>
             <div className="flex mt-1">
               <button
-                id='apple'
+                id='discord'
                 type='submit'
                 className="border border-white/80 px-2 py-1 rounded-lg hover:border-secondary_color mr-2"
                 onClick={handleAuth}
               >
-                <FontAwesomeIcon icon={faApple} style={{ fontSize: '30px' }} />
+                <FontAwesomeIcon icon={faDiscord} style={{ fontSize: '30px' }} />
               </button>
               <button
                 id='google'
