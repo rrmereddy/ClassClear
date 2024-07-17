@@ -15,7 +15,8 @@ body {
   width: 100dvw;
   overflow-x: hidden;
   height: 100%;
-  background: linear-gradient(145deg, #0e0e0e, #1a1a1a);
+  background-color: #000000;
+  background-image: url("/bg-image.png");
 }
 
 .glass {
