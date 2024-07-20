@@ -6,7 +6,6 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import session from "express-session";
 import GoogleStrategy from "passport-google-oauth2";
-import AppleStrategy from "passport-apple";
 import DiscordStrategy from "passport-discord";
 import dotenv from "dotenv";
 import cors from "cors";

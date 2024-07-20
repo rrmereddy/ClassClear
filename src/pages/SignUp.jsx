@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faApple, faGoogle, faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { faGoogle, faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import PasswordStrength, { calculatePasswordStrength } from '../components/PasswordStrength';
 import { useNavigate } from 'react-router-dom';
@@ -147,7 +147,7 @@ const SignUp = () => {
               <button
                 id='discord'
                 type='submit'
-                className="border border-white/80 px-2 py-1 rounded-lg hover:border-secondary_color mr-2"
+                className="center border border-white/80 px-2 py-1 rounded-lg hover:border-secondary_color mr-2"
                 onClick={handleAuth}
               >
                 <FontAwesomeIcon icon={faDiscord} style={{ fontSize: '30px' }} />
@@ -155,7 +155,7 @@ const SignUp = () => {
               <button
                 id='google'
                 type='submit'
-                className="center border border-white/80 px-2 py-1 rounded-lg hover:border-secondary_color"
+                className="center border border-white/80 px-3 py-1 rounded-lg hover:border-secondary_color"
                 onClick={handleAuth}
               >
                 <FontAwesomeIcon icon={faGoogle} style={{ fontSize: '25px' }} />
