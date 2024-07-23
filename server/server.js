@@ -13,7 +13,8 @@ import cors from "cors";
 dotenv.config();
 const app = express();
 const port = 5001;
-const saltRounds = process.env.SALT_ROUNDS;
+const saltRounds = 12;
+
 
 app.use(
   session({
