@@ -1,21 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle, faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { useAuth } from '../utils/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  const { handleAuthContext, loginUser, error } = useAuth();
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-    setError('');
   };
 
   const handleEmailChange = (e) => {
@@ -24,56 +23,18 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch('http://localhost:5001/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-  
-    const data = await response.json();
-  
-    if (response.ok) {
-      console.log('Login successful');
-      navigate("/dashboard");
-    } else {
-      console.error('Login failed:', data.message);
-      setError(data.message);
-    }
+    const userInfo = { email, password };
+    await loginUser(userInfo);
   };
 
   const handleAuth = (e) => {
     e.preventDefault();
-    const buttonId = e.currentTarget.id;
-    const authUrl = buttonId === 'discord' 
-      ? 'http://localhost:5001/auth/discord' 
-      : 'http://localhost:5001/auth/google';
-    
-    const authWindow = window.open(authUrl, '_blank', 'width=500,height=600');
-    
-    window.addEventListener('message', (event) => {
-      if (event.origin !== 'http://localhost:5001') return;
-      
-      if (event.data.type === 'AUTH_SUCCESS') {
-        console.log('Authentication successful');
-        authWindow.close();
-        navigate("/");
-      } else if (event.data.type === 'AUTH_FAILURE') {
-        console.log('Authentication failed');
-        setError('Authentication failed')
-        authWindow.close();
-      }
-    }, false);
+    handleAuthContext(e);
   };
   
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
-
-  useGSAP(() => {
-    gsap.from('.glass', { opacity: 0, duration: 1, y: -50, ease: 'elastic' });
-  }, []);
 
   return (
     <div className="center h-screen">
@@ -121,7 +82,7 @@ const Login = () => {
               Login
               <FontAwesomeIcon icon={faSignIn} className="ml-2" />
             </button>
-            <a href="/login/forgot-password" className="relative bottom-6 md:left-[105px] left-[70px] mt-2 mb-8 text-sm  text-amber-500 hover:text-amber-700">Forgot Password?</a>
+            <a href="/login/forgot-password" className="relative bottom-6 md:left-[105px] left-[70px] mt-2 mb-8 text-sm text-amber-500 hover:text-amber-700">Forgot Password?</a>
           </div>
         </form>
         <div className="flex items-center mt-1">
@@ -158,7 +119,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default Login;

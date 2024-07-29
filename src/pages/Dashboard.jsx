@@ -2,6 +2,7 @@ import Sidebar from "../components/SideBarComp/Sidebar"
 import Deadlines from "../components/DashBoardComp/Deadlines"
 
 const Dashboard = () => {
+  
   return (
       <section className="h-screen w-full flex">
         <Sidebar />

@@ -5,18 +5,19 @@ import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import PasswordStrength, { calculatePasswordStrength } from '../components/PasswordStrength';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
+import { useAuth } from '../utils/AuthContext';
 import { useGSAP } from '@gsap/react';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  let { handleAuthContext, signUpUser, error } = useAuth();
+
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-    setError('');
   };
 
   const handleEmailChange = (e) => {
@@ -25,57 +26,13 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const passwordStrength = calculatePasswordStrength(password);
-    if (passwordStrength < 4) {
-      setError('Please choose a stronger password.');
-      return;
-    }
-    try {
-      const response = await fetch('http://localhost:5001/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        console.log('Signup successful');
-        navigate('/');
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Signup failed');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setError('An error occurred. Please try again.');
-    }
-
-    console.log('Form submitted', { email, password });
+    signUpUser({ email, password});
+    console.log('Form submitted');
   }
 
   const handleAuth = (e) => {
     e.preventDefault();
-    const buttonId = e.currentTarget.id;
-    const authUrl = buttonId === 'discord' 
-      ? 'http://localhost:5001/auth/discord' 
-      : 'http://localhost:5001/auth/google';
-    
-    const authWindow = window.open(authUrl, '_blank', 'width=500,height=600');
-    
-    window.addEventListener('message', (event) => {
-      if (event.origin !== 'http://localhost:5001') return;
-      
-      if (event.data.type === 'AUTH_SUCCESS') {
-        console.log('Authentication successful');
-        authWindow.close();
-        navigate("/");
-      } else if (event.data.type === 'AUTH_FAILURE') {
-        console.log('Authentication failed');
-        setError('Authentication failed')
-        authWindow.close();
-      }
-    }, false);
+    handleAuthContext(e);
   };
 
   const toggleShowPassword = () => {
