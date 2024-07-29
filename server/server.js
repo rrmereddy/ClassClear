@@ -9,12 +9,15 @@ import GoogleStrategy from "passport-google-oauth2";
 import DiscordStrategy from "passport-discord";
 import dotenv from "dotenv";
 import cors from "cors";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+
+//TODO: Login is not working currently
 
 dotenv.config();
 const app = express();
 const port = 5001;
 const saltRounds = 12;
-
 
 app.use(
   session({
@@ -36,14 +39,62 @@ const db = new pg.Client({
 });
 
 db.connect();
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
-app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+const generateAccessToken = (user) => {
+  return jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "5m",
+  });
+};
+
+const generateRefreshToken = (user) => {
+  return jwt.sign({ email: user.email }, process.env.REFRESH_TOKEN_SECRET);
+};
+
+app.post("/api/refresh", async (req, res) => {
+  const refreshToken = req.body.token;
+  if (!refreshToken) {
+    return res.status(401).json({ message: "You are not authenticated" });
+  }
+  const data = db.query("SELECT * FROM users WHERE refresh_token=($1)", [
+    refreshToken,
+  ]);
+  if (!data) {
+    return res.status(403).json("Refresh token is not valid!");
+  }
+
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    async (err, user) => {
+      err & console.log(err);
+      const newAccessToken = generateAccessToken(user);
+      const newRefreshToken = generateRefreshToken(user);
+      await db.query("UPDATE users SET refresh_token = $1 WHERE email = $2", [
+        newRefreshToken,
+        user.email,
+      ]);
+
+      res.status(200).json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
+    }
+  );
+});
 
 app.post("/login", (req, res) => {
   passport.authenticate("local", (err, user, info) => {
@@ -55,18 +106,25 @@ app.post("/login", (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    req.logIn(user, (err) => {
+    req.logIn(user, async (err) => {
       if (err) {
         return res.status(500).json({ message: "Failed to log in" });
       }
-      return res.status(200).json({ message: "Login successful" });
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
+      await db.query("UPDATE users SET refresh_token = $1 WHERE email = $2", [
+        refreshToken,
+        user.email,
+      ]);
+      return res
+        .status(200)
+        .json({ accessToken: accessToken, message: "Login successful" });
     });
   })(req, res);
 });
 
 app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body);
 
   try {
     const checkResult = await db.query("SELECT * FROM users WHERE email=$1", [
@@ -82,16 +140,22 @@ app.post("/signup", async (req, res) => {
           return res.status(500).json({ message: "Error creating user" });
         }
         try {
+          const refreshToken = generateRefreshToken({ email });
+          const accessToken = generateAccessToken({ email });
           const user = await db.query(
-            "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
-            [email, hash]
+            "INSERT INTO users (email, password, refresh_token) VALUES ($1, $2, $3) RETURNING *",
+            [email, hash, refreshToken]
           );
           req.login(user.rows[0], (err) => {
             if (err) {
               console.error(err);
-              return res.status(500).json({ message: "Error logging in" });
+              return res
+                .status(500)
+                .json({ accessToken, message: "Error logging in" });
             } else {
-              return res.status(200).json({ message: "Signup successful" });
+              return res
+                .status(200)
+                .json({ accessToken, message: "Signup successful" });
             }
           });
         } catch (err) {
@@ -104,6 +168,30 @@ app.post("/signup", async (req, res) => {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
+});
+
+const verify = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+      if (err) {
+        return res
+          .status(403)
+          .json({ message: "Token is invalid! You are not authenticated!" });
+      }
+
+      req.user = user;
+      next();
+    });
+  }
+};
+
+app.post("/logout", verify, async (req, res) => {
+  await db.query("UPDATE users SET refreshToken = $1 WHERE email = $2", [
+    null,
+    req.user.email,
+  ]);
 });
 
 app.get("/auth/discord", passport.authenticate("discord"));
@@ -230,17 +318,32 @@ passport.use(
         );
 
         if (db_profile.rows.length == 0) {
+          const accessToken = generateAccessToken({ email: profile.email });
+          const refreshToken = generateRefreshToken({ email: profile.email });
+
           try {
-            const user = await db.query(
-              "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
-              [profile.email, process.env.DISCORD_FILLER_PASSWORD]
+            let user = await db.query(
+              "INSERT INTO users (email, password, refresh_token) VALUES ($1, $2, $3) RETURNING *",
+              [profile.email, process.env.DISCORD_FILLER_PASSWORD, refreshToken]
             );
-            return cb(null, user.rows[0]);
+            user = user.rows[0];
+            user = { ...user, accessToken, refreshToken };
+
+            return cb(null, user);
           } catch (err) {
             return cb(null, err);
           }
         } else {
-          cb(null, db_profile.rows[0]);
+          let user = db_profile.rows[0];
+          const accessToken = generateAccessToken(user);
+          const refreshToken = generateRefreshToken(user);
+          user = { ...user, accessToken, refreshToken };
+
+          await db.query(
+            "UPDATE users SET refresh_token = $1 WHERE email = $2",
+            [refreshToken, user.email]
+          );
+          cb(null, user);
         }
       } catch (err) {
         return cb(null, err);
@@ -265,13 +368,29 @@ passport.use(
           profile.email,
         ]);
         if (result.rows.length == 0) {
+          const accessToken = generateAccessToken({ email: profile.email });
+          const refreshToken = generateRefreshToken({ email: profile.email });
+
           const newUser = await db.query(
-            "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
-            [profile.email, process.env.GOOGLE_FILLER_PASSWORD]
+            "INSERT INTO users (email, password, refresh_token) VALUES ($1, $2, $3) RETURNING *",
+            [profile.email, process.env.GOOGLE_FILLER_PASSWORD, refreshToken]
           );
-          return cb(null, newUser.rows[0]);
+
+          newUser = newUser.rows[0];
+          newUser = { ...newUser, accessToken, refreshToken };
+
+          return cb(null, newUser);
         } else {
-          return cb(null, result.rows[0]);
+          let user = result.rows[0];
+          const accessToken = generateAccessToken(user);
+          const refreshToken = generateRefreshToken(user);
+          user = { ...user, accessToken, refreshToken };
+
+          await db.query(
+            "UPDATE users SET refresh_token = $1 WHERE email = $2",
+            [refreshToken, user.email]
+          );
+          return cb(null, user);
         }
       } catch (err) {
         cb(null, err);

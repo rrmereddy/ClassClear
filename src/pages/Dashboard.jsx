@@ -1,6 +1,8 @@
 import Sidebar from "../components/SideBarComp/Sidebar"
+import { useEffect } from "react"
 
 const Dashboard = () => {
+  
   return (
       <section className="min-h-screen flex gap-6">
         <Sidebar />
