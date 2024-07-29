@@ -12,7 +12,7 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 
-//TODO: Login is not working currently
+
 
 dotenv.config();
 const app = express();
