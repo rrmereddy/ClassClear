@@ -1,13 +1,18 @@
 import Sidebar from "../components/SideBarComp/Sidebar"
-import { useEffect } from "react"
+import Deadlines from "../components/DashBoardComp/Deadlines"
 
 const Dashboard = () => {
   
   return (
-      <section className="min-h-screen flex gap-6">
+      <section className="h-screen w-full flex">
         <Sidebar />
-        <div className="m-3 text-2xl text-primary_color font-semibold">
-          <h1>Dashboard</h1>
+        <div className="size-full grid gap-4 grid-rows-4 grid-cols-10 p-4">
+          <div className="col-span-5 row-span-3 center glass rounded-3xl p-4">Courses</div>
+          <div className="col-span-5 row-span-2 center glass rounded-3xl p-4">
+            <Deadlines />
+          </div>
+          <div className="col-span-5 row-span-1 center glass rounded-3xl p-4">Other Features</div>
+          <div className="col-span-10 row-span-4 center glass rounded-3xl p-4">Other Features</div>
         </div>
       </section>
 

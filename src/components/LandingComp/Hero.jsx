@@ -9,28 +9,35 @@ gsap.registerPlugin(TextPlugin);
 
 const Hero = () => {
   useGSAP(() => {
-    gsap.fromTo('#header', { text: '' }, { text: 'Redefining the Syllabus Experience', duration: 2, delay: 0.5, ease: 'power4.out'});
-  }, [])
+    const tl = gsap.timeline();
+    
+    tl.fromTo('#header-start', { text: '' }, { text: 'Redefining the ', duration: 0.75, ease: 'power4.out' })
+      .fromTo('#header-syllabus', { text: '' }, { text: 'Syllabus', duration: 1, ease: 'power4.out' })
+      .fromTo('#header-end', { text: '' }, { text: ' Experience', duration: 0.75, ease: 'power4.out' })
+      .from('.card-wrapper', { y: 50, opacity: 0, duration: 1, delay: 0.5, ease: 'power4.out'})
+      .from('#text', { opacity: 0, duration: 0.5, ease: 'power4.out'});
+  }, []);
 
-  return(
+  return (
     <div className="text-center mt-16">
-    <h2 id='header' className="text-5xl font-bold text-primary_color mb-6">
-      Redefining the Syllabus Experience
-    </h2>
-    <p className="text-xl text-tertiary_color mb-8 max-w-2xl mx-auto">
-      Say goodbye to endless scrolling. Access all your course information with a single click.
-    </p>
-    <Link to='/signup' className='center'>
-      <div className="center card-wrapper h-[50px] w-[150px]">
-        <div className="center card-content text-sm hover:text-secondary_color">
-          Get Started
-          <FontAwesomeIcon icon={faArrowRight} className='ml-2' />
+      <h2 id='header' className="text-5xl font-bold text-primary_color mb-6">
+        <span id="header-start"></span>
+        <span id="header-syllabus" className="text-secondary_color"></span>
+        <span id="header-end"></span>
+      </h2>
+      <p id='text' className="text-xl text-tertiary_color mb-8 max-w-2xl mx-auto">
+        Say goodbye to endless scrolling. Access all your course information with a single click.
+      </p>
+      <Link to='/signup' className='center'>
+        <div className="center card-wrapper h-[50px] w-[150px]">
+          <div className="center card-content text-sm hover:text-secondary_color">
+            Get Started
+            <FontAwesomeIcon icon={faArrowRight} className='ml-2' />
+          </div>
         </div>
-      </div>
-    </Link>
-  </div>
-  )
+      </Link>
+    </div>
+  );
 };
-  
-  export default Hero;
-  
+
+export default Hero;
