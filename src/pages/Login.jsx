@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle, faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../utils/AuthContext';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
 
   const { handleAuthContext, loginUser, error } = useAuth();
 
@@ -35,6 +35,10 @@ const Login = () => {
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
+  useGSAP(() => {
+    gsap.from('.glass', { opacity: 0, duration: 1, y: -50, ease: 'elastic' });
+  }, []);
 
   return (
     <div className="center h-screen">

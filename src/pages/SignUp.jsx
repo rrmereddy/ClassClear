@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle, faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { faSignIn, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import PasswordStrength, { calculatePasswordStrength } from '../components/PasswordStrength';
-import { useNavigate } from 'react-router-dom';
+import PasswordStrength from '../components/PasswordStrength';
 import gsap from 'gsap';
 import { useAuth } from '../utils/AuthContext';
 import { useGSAP } from '@gsap/react';
@@ -12,7 +11,6 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
 
   let { handleAuthContext, signUpUser, error } = useAuth();
 
