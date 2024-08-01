@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900'); 
 
 @tailwind base;
 @tailwind components;
@@ -15,8 +15,58 @@ body {
   width: 100dvw;
   overflow-x: hidden;
   height: 100%;
-  background: #141414;
+  background-color: #000000;
+  /*background-image: url("/bg-image.png");
+  background: linear-gradient(145deg, #0e0e0e, #1a1a1a);*/
 }
 
-@layer utilities{
+.glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+}
+
+@layer utilities {
+  .center {
+    @apply flex items-center justify-center;
+  }
+
+  .ls-container {
+    @apply md:w-96 md:p-6 sm:w-80 sm:p-4 min-w-60 p-4 rounded-lg shadow-lg;
+  }
+
+  .ls-h1 {
+    @apply text-2xl font-semibold text-primary_color text-center;
+  }
+
+  .ls-label {
+    @apply block text-sm font-medium text-white;
+  }
+
+  .ls-info {
+    @apply mt-1 block w-full px-3 py-2 border rounded-lg text-primary_color bg-transparent focus:outline-none focus:border-secondary_color sm:text-sm;
+  }
+
+  .ls-btn {
+    @apply w-1/2 py-2 px-4 border border-primary_color text-primary_color rounded-md text-sm font-medium bg-transparent hover:bg-secondary_color hover:border-gray-800 transition duration-200 ease-in-out;
+  }
+
+  .card-wrapper {
+    @apply relative bg-gradient-to-b from-zinc-700 to-zinc-800 rounded-xl overflow-hidden;
+  }
+
+  .card-wrapper::before {
+    background: conic-gradient(
+      rgb(245, 158, 11) 0deg,
+      rgb(194, 123, 0) 0deg,
+      transparent 40deg
+      );
+
+    @apply absolute size-[400%] content-[''] animate-border-spin;
+  }
+
+  .card-content{
+    @apply absolute size-[calc(100%-2px)] bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-xl;
+  }
 }
