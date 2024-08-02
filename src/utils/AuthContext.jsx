@@ -1,6 +1,7 @@
 import { useContext, useState, createContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode"
 import PasswordStrength, { calculatePasswordStrength } from '../components/PasswordStrength';
 
 const AuthContext = createContext();
@@ -39,10 +40,10 @@ export const AuthProvider = ({children}) => {
 
     const refreshToken = async () => {
         try {
-            const res = await axios.post("http:localhost:5001/api/refresh", {
+            const res = await axios.post("http://localhost:5001/api/refresh", {
                 token: user.refreshToken,
             });
-        
+
             setUser({
                 accessToken: res.data.accessToken,
                 refreshToken: res.data.refreshToken,
@@ -58,18 +59,16 @@ export const AuthProvider = ({children}) => {
     axiosJWT.interceptors.request.use(
         async (config) => {
             let currentDate = new Date();
-            const decodedToken = jwtDecode(user);
+            const decodedToken = jwtDecode(user.accessToken);
             //If expiration time is smaller than current time
             if (decodedToken.exp * 1000 < currentDate.getTime()) {
                 const data = await refreshToken();
                 config.headers["authorization"] = "Bearer " + data.accessToken;
             }
-
-            setUser({accessToken: data.accessToken, refreshToken: data.refreshToken});
-
             return config;
         },
         (error) => {
+            console.error(error);
             return Promise.reject(error);
         }
     );
@@ -130,9 +129,34 @@ export const AuthProvider = ({children}) => {
         }, false);
     }
 
+    async function handleAddCourse(courseData) {
+        try {
+            const { courseName, universityName, courseInstructor, courseDescription  } = courseData
+            const response = await axiosJWT.post("http://localhost:5001/courses", 
+                {courseName, universityName, courseInstructor, courseDescription },
+                {
+                    headers: {
+                        authorization: "Bearer " + user.accessToken,
+                    },
+                    withCredentials: true,
+                }
+            );
+
+            if (response.data.error) {
+                alert(response.error);
+            } else {
+                alert("Course Added!");
+            }
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     let contextData = {
         user,
         loginUser,
+        handleAddCourse,
         handleAuthContext,
         logoutUser,
         signUpUser,
