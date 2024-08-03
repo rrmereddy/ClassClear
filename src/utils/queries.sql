@@ -13,6 +13,10 @@ CREATE TABLE syllabus_metadata (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+ALTER TABLE syllabus_metadata
+ADD COLUMN course_instructor VARCHAR(255),
+ADD COLUMN course_description TEXT
+
 CREATE TYPE cat AS ENUM ('Exam', 'Project', 'Homework');
 
 CREATE TABLE deadlines (

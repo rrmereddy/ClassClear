@@ -12,8 +12,6 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 
-
-
 dotenv.config();
 const app = express();
 const port = 5001;
@@ -69,31 +67,46 @@ app.post("/api/refresh", async (req, res) => {
   if (!refreshToken) {
     return res.status(401).json({ message: "You are not authenticated" });
   }
-  const data = db.query("SELECT * FROM users WHERE refresh_token=($1)", [
-    refreshToken,
-  ]);
-  if (!data) {
-    return res.status(403).json("Refresh token is not valid!");
-  }
 
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    async (err, user) => {
-      err & console.log(err);
-      const newAccessToken = generateAccessToken(user);
-      const newRefreshToken = generateRefreshToken(user);
-      await db.query("UPDATE users SET refresh_token = $1 WHERE email = $2", [
-        newRefreshToken,
-        user.email,
-      ]);
+  try {
+    const data = await db.query(
+      "SELECT * FROM users WHERE refresh_token = $1",
+      [refreshToken]
+    );
 
-      res.status(200).json({
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      });
+    if (data.rows.length === 0) {
+      return res.status(403).json("Refresh token is not valid!");
     }
-  );
+
+    const user = data.rows[0];
+
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      async (err, user) => {
+        if (err) {
+          console.log(err);
+          return res.status(403).json("Refresh token is not valid!");
+        }
+
+        const newAccessToken = generateAccessToken(user);
+        const newRefreshToken = generateRefreshToken(user);
+
+        await db.query("UPDATE users SET refresh_token = $1 WHERE email = $2", [
+          newRefreshToken,
+          user.email,
+        ]);
+
+        res.status(200).json({
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken,
+        });
+      }
+    );
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
 });
 
 app.post("/login", (req, res) => {
@@ -267,6 +280,32 @@ app.get("/auth/google/redirect", (req, res, next) => {
       });
     }
   })(req, res, next);
+});
+
+app.post("/courses", verify, async (req, res) => {
+  const { courseName, universityName, courseInstructor, courseDescription } =
+    req.body;
+  try {
+    const user_id = await db.query("SELECT * FROM users where email=$1", [
+      req.user.email,
+    ]);
+
+    await db.query(
+      "INSERT INTO syllabus_metadata (name, university_name, user_id, course_instructor, course_description) VALUES ($1, $2, $3, $4, $5)",
+      [
+        courseName,
+        universityName,
+        user_id.rows[0].id,
+        courseInstructor,
+        courseDescription,
+      ]
+    );
+
+    res.status(200).send({ message: "Successfully added course!" });
+  } catch (err) {
+    res.status(400).send({ error: "Error ocurred" });
+    console.error(err);
+  }
 });
 
 passport.use(
