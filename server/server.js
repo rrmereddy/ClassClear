@@ -12,6 +12,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
+import axios from "axios";
 
 dotenv.config();
 const app = express();
@@ -225,6 +226,28 @@ app.post("/getcourses", verify, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(400).send({ error: err });
+  }
+});
+
+app.get("/universitynames", async (req, res) => {
+  const { search } = req.body;
+  try {
+    const response = await axios.get(
+      `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-colleges-and-universities/records`,
+      {
+        params: {
+          select: "name",
+          where: `startswith(name, "${search}")`,
+          limit: 10,
+        },
+      }
+    );
+
+    const universityNames = response.data.results.map((result) => result);
+    res.status(200).json({ universityNames });
+  } catch (err) {
+    res.status(400).json({ error: err });
+    console.error(err);
   }
 });
 

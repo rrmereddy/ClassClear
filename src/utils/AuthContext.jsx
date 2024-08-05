@@ -173,6 +173,23 @@ export const AuthProvider = ({children}) => {
         }
     }
 
+    async function getUniversityNames(search) {
+        const res = await axios.post("http://localhost:5001/universitynames", 
+            { search },
+            {
+                withCredentials: true,
+            }
+        )
+
+        if (res.data.error) {
+            alert("Issue fetching university names");
+            return;
+        } else {
+            const uniNames = res.data.universityNames;
+            return uniNames;
+        }
+    }
+
     let contextData = {
         user,
         loginUser,
@@ -181,6 +198,7 @@ export const AuthProvider = ({children}) => {
         logoutUser,
         signUpUser,
         getCourses,
+        getUniversityNames, //function gets university names according to search parameter passed in
         error
     }
 
