@@ -4,6 +4,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons"
 import { useState } from "react"
 import AuthContext from "@/utils/AuthContext"
 import { useAuth } from "@/utils/AuthContext"
+import { Textarea } from "@/components/ui/textarea"
 
 const Courses = () => {
   const [click, setClick] = useState(false)
@@ -52,11 +53,11 @@ const Courses = () => {
         </div>
         {click && (
           <div className="m-3 bg-[#171717] border rounded-xl size-fit p-10 text-2xl text-primary_color font-semibold">
-            <form onSubmit={handleFormSubmit} className="flex text-black flex-col gap-4">
+            <form onSubmit={handleFormSubmit} className="flex text-white flex-col gap-4">
               <input value={courseName} onChange={handleCourseName} type="text" placeholder="Course Name" className="p-2 rounded-md bg-black" />
               <input value={universityName} onChange={handleUniversityName} type="text" placeholder="University Name" className="p-2 rounded-md bg-black" />
               <input value={courseInstructor} onChange={handleCourseInstructor} type="text" placeholder="Course Instructor" className="p-2 rounded-md bg-black" />
-              <input value={courseDescription} onChange={handleCourseDescription} type="text" placeholder="Course Description" className="p-2 rounded-md bg-black" />
+              <Textarea value={courseDescription} onChange={handleCourseDescription} placeholder="Enter the Course Description" />
               <button type='submit' className="bg-green-700 p-2 rounded-md text-white">Add Course</button>
             </form>
           </div>
