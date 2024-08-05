@@ -1,10 +1,10 @@
-import Sidebar from "../components/SideBarComp/Sidebar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
-import { useAuth } from "@/utils/AuthContext";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast"; // Import toast components from ShadCN UI
+import Sidebar from "../components/SideBarComp/Sidebar"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPlus } from "@fortawesome/free-solid-svg-icons"
+import { useEffect, useState } from "react"
+import AuthContext from "@/utils/AuthContext"
+import { useAuth } from "@/utils/AuthContext"
+import axios from "axios"
 
 const Courses = () => {
   const [click, setClick] = useState(false);
@@ -12,9 +12,22 @@ const Courses = () => {
   const [universityName, setUniversityName] = useState('');
   const [courseInstructor, setCourseInstructor] = useState('');
   const [courseDescription, setCourseDescription] = useState('');
+  const [courses, setCourses] = useState([]); //courses is an array of JSONs. Each JSON represents one course
 
-  const { handleAddCourse } = useAuth();
-  const { toast } = useToast(); // Get the showToast function from useToast
+  const { handleAddCourse, getCourses } = useAuth();
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const coursesData = await getCourses();
+        setCourses(coursesData);
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    };
+
+    fetchCourses();
+  }, [getCourses]);
 
   function handleCourseName(e) {
     setCourseName(e.target.value);
@@ -32,6 +45,7 @@ const Courses = () => {
     setCourseDescription(e.target.value);
   }
 
+  const handleFormSubmit = async (e) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     
@@ -59,6 +73,10 @@ const Courses = () => {
         status: "success"
       });
     }
+
+    const course = { courseName, universityName, courseInstructor, courseDescription };
+    setCourses([...courses, course]);
+    await handleAddCourse(course);
   }
 
   return (
