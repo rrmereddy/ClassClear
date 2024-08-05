@@ -153,6 +153,26 @@ export const AuthProvider = ({children}) => {
         }
     }
 
+    async function getCourses() {
+        const res = await axiosJWT.post("http://localhost:5001/getcourses", 
+            {accessToken: user.accessToken}, 
+            {
+                headers: {
+                    authorization: "Bearer " + user.accessToken,
+                },
+                withCredentials: true,
+            }
+        )
+
+        if (res.data.error) {
+            alert("There was an issue fetching your courses");
+            return;
+        } else {
+            const courses = (res.data.courses);
+            return courses;
+        }
+    }
+
     let contextData = {
         user,
         loginUser,
@@ -160,6 +180,7 @@ export const AuthProvider = ({children}) => {
         handleAuthContext,
         logoutUser,
         signUpUser,
+        getCourses,
         error
     }
 

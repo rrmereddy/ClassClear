@@ -6,6 +6,7 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import session from "express-session";
 import GoogleStrategy from "passport-google-oauth2";
+import { jwtDecode } from "jwt-decode";
 import DiscordStrategy from "passport-discord";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -205,6 +206,26 @@ app.post("/logout", verify, async (req, res) => {
     null,
     req.user.email,
   ]);
+});
+
+app.post("/getcourses", verify, async (req, res) => {
+  const { accessToken } = req.body;
+  const decodedPayload = jwtDecode(accessToken);
+  const email = decodedPayload.email;
+  try {
+    let user_id = await db.query("SELECT * FROM users WHERE email=$1", [email]);
+    user_id = user_id.rows[0].id;
+    let course_info = await db.query(
+      "SELECT name,university_name,course_description,course_instructor FROM syllabus_metadata WHERE user_id=$1",
+      [user_id]
+    );
+
+    course_info = course_info.rows;
+    res.status(200).send({ courses: course_info });
+  } catch (err) {
+    console.error(err);
+    res.status(400).send({ error: err });
+  }
 });
 
 app.get("/auth/discord", passport.authenticate("discord"));

@@ -1,9 +1,10 @@
 import Sidebar from "../components/SideBarComp/Sidebar"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import AuthContext from "@/utils/AuthContext"
 import { useAuth } from "@/utils/AuthContext"
+import axios from "axios"
 
 const Courses = () => {
   const [click, setClick] = useState(false)
@@ -11,8 +12,22 @@ const Courses = () => {
   const [universityName, setUniversityName] = useState('');
   const [courseInstructor, setCourseInstructor] = useState('');
   const [courseDescription, setCourseDescription] = useState('');
+  const [courses, setCourses] = useState([]); //courses is an array of JSONs. Each JSON represents one course
 
-  const { handleAddCourse } = useAuth();
+  const { handleAddCourse, getCourses } = useAuth();
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const coursesData = await getCourses();
+        setCourses(coursesData);
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    };
+
+    fetchCourses();
+  }, [getCourses]);
 
   function handleCourseName(e) {
     setCourseName(e.target.value);
@@ -30,15 +45,17 @@ const Courses = () => {
     setCourseDescription(e.target.value);
   }
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     
     if (!courseName || !universityName || !courseInstructor || !courseDescription) {
       alert("Please fill in all fields");
       return;
     }
-    
-    handleAddCourse({ courseName, universityName, courseInstructor, courseDescription });
+
+    const course = { courseName, universityName, courseInstructor, courseDescription };
+    setCourses([...courses, course]);
+    await handleAddCourse(course);
   }
 
   return (
