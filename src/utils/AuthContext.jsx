@@ -131,9 +131,9 @@ export const AuthProvider = ({children}) => {
 
     async function handleAddCourse(courseData) {
         try {
-            const { courseName, universityName, courseInstructor, courseDescription  } = courseData
+            const { courseName, universityName, courseInstructor, courseDescription } = courseData;
             const response = await axiosJWT.post("http://localhost:5001/courses", 
-                {courseName, universityName, courseInstructor, courseDescription },
+                { courseName, universityName, courseInstructor, courseDescription },
                 {
                     headers: {
                         authorization: "Bearer " + user.accessToken,
@@ -141,15 +141,16 @@ export const AuthProvider = ({children}) => {
                     withCredentials: true,
                 }
             );
-
+    
             if (response.data.error) {
-                alert(response.error);
+                return { error: response.data.error };
             } else {
-                alert("Course Added!");
+                return { success: "Course Added!" };
             }
-
+    
         } catch (err) {
             console.error(err);
+            return { error: "An error occurred while adding the course." };
         }
     }
 

@@ -9,6 +9,7 @@ import { SidebarProvider } from './components/SideBarComp/SidebarContext';
 import PrivateRoutes from './utils/PrivateRoutes';
 import { AuthProvider } from './utils/AuthContext';
 import { ThemeProvider } from './utils/theme-provider';
+import { Toaster } from "@/components/ui/toaster"
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
         <Router>
             <AuthProvider>
               <SidebarProvider>
+                <Toaster />
                 <ThemeProvider>
                   <Routes>
                     <Route path='/' element={<Landing />} />
