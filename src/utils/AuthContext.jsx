@@ -2,7 +2,7 @@ import { useContext, useState, createContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"
-import PasswordStrength, { calculatePasswordStrength } from '../components/PasswordStrength';
+import { calculatePasswordStrength } from '../components/PasswordStrength';
 
 const AuthContext = createContext();
 

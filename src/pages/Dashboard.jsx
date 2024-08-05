@@ -1,5 +1,6 @@
 import Sidebar from "../components/SideBarComp/Sidebar"
 import Deadlines from "../components/DashBoardComp/Deadlines"
+import AddCourse from "@/components/AddCourse"
 
 const Dashboard = () => {
   
@@ -7,7 +8,12 @@ const Dashboard = () => {
       <section className="h-screen w-full flex">
         <Sidebar />
         <div className="size-full grid gap-4 grid-rows-4 grid-cols-10 p-4">
-          <div className="col-span-5 row-span-3 center glass rounded-3xl p-4">Courses</div>
+          <div className="col-span-5 row-span-3 center glass rounded-3xl p-4">
+            Courses
+            <div className="absolute top-0 right-0 p-2">
+              <AddCourse />
+            </div>
+          </div>
           <div className="col-span-5 row-span-2 center glass rounded-3xl p-4">
             <Deadlines />
           </div>
