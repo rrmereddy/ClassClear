@@ -1,5 +1,5 @@
 import Sidebar from "../components/SideBarComp/Sidebar"
-import AddCourse  from '../components/AddCourse';
+import AddCourse  from '../components/CoursesComp/AddCourse';
 
 
 const Courses = () => {

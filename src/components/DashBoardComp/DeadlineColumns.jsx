@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 // This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+
 const DeadlineColumn = [
   {
     accessorKey: "id",
@@ -34,7 +34,7 @@ const DeadlineColumn = [
             }}
           >
             
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <ArrowUpDown className="h-4 w-4" />
           </Button>
         </div>
       )

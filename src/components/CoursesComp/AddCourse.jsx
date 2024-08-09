@@ -10,39 +10,27 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "./ui/textarea";
-import { useEffect, useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 import { useAuth } from "@/utils/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
 const AddCourse = () => {
-  const [courseName, setCourseName] = useState('');
-  const [universityName, setUniversityName] = useState('');
-  const [courseInstructor, setCourseInstructor] = useState('');
-  const [courseDescription, setCourseDescription] = useState('');
-  const [courses, setCourses] = useState([]); // courses is an array of JSONs. Each JSON represents one course
+  const [course, setCourse] = useState({
+    courseName: '',
+    universityName: '',
+    courseInstructor: '',
+    courseDescription: ''
+  });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  const { handleAddCourse, getCourses } = useAuth();
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const coursesData = await getCourses();
-        setCourses(coursesData);
-      } catch (error) {
-        console.error('Error fetching courses:', error);
-      }
-    };
-
-    fetchCourses();
-  }, [getCourses]);
+  const { handleAddCourse } = useAuth();
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    if (!courseName || !universityName || !courseInstructor || !courseDescription) {
+    if (!course.courseName || !course.universityName || !course.courseInstructor || !course.courseDescription) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -52,10 +40,8 @@ const AddCourse = () => {
       return;
     }
 
-    const course = { courseName, universityName, courseInstructor, courseDescription };
-    setCourses([...courses, course]);
 
-    const result = await handleAddCourse({ courseName, universityName, courseInstructor, courseDescription });
+    const result = await handleAddCourse(course);
 
     if (result.error) {
       toast({
@@ -75,11 +61,17 @@ const AddCourse = () => {
     }
   }
 
+  const handleCourseChange = (e) => {
+    setCourse(prev=>({ ...prev, [e.target.name]: e.target.value }));
+  }
+
   const handleDialogClose = () => {
-    setCourseName('');
-    setUniversityName('');
-    setCourseInstructor('');
-    setCourseDescription('');
+    setCourse({
+      courseName: '',
+      universityName: '',
+      courseInstructor: '',
+      courseDescription: ''
+    });
   }
 
   return (
@@ -109,8 +101,8 @@ const AddCourse = () => {
                 id="course"
                 placeholder="CSCE-120"
                 className="col-span-3"
-                value={courseName}
-                onChange={(e) => { setCourseName(e.target.value) }}
+                name="courseName"
+                onChange={handleCourseChange}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -121,8 +113,8 @@ const AddCourse = () => {
                 id="university"
                 placeholder="Texas A&M University"
                 className="col-span-3"
-                value={universityName}
-                onChange={(e) => { setUniversityName(e.target.value) }}
+                name="universityName"
+                onChange={handleCourseChange}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -133,8 +125,8 @@ const AddCourse = () => {
                 id="instructor"
                 placeholder="Pedro Duarte"
                 className="col-span-3"
-                value={courseInstructor}
-                onChange={(e) => { setCourseInstructor(e.target.value) }}
+                name="courseInstructor"
+                onChange={handleCourseChange}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -145,8 +137,8 @@ const AddCourse = () => {
                 id="description"
                 placeholder="This is a course about computer science."
                 className="col-span-3"
-                value={courseDescription}
-                onChange={(e) => { setCourseDescription(e.target.value) }}
+                name="courseDescription"
+                onChange={handleCourseChange}
               />
             </div>
           </div>
