@@ -2,6 +2,7 @@ import Sidebar from "../components/SideBarComp/Sidebar"
 import Deadlines from "../components/DashBoardComp/Deadlines"
 import AddCourse from "@/components/CoursesComp/AddCourse"
 import CourseCard from "@/components/CoursesComp/CourseCard"
+import AddDeadline from "@/components/CoursesComp/AddDeadline"
 
 const Dashboard = () => {
   
@@ -17,6 +18,9 @@ const Dashboard = () => {
           </div>
           <div className="flex flex-col col-span-5 row-span-2 center glass rounded-3xl p-2">
             <div className="absolute top-5 left-auto">Deadlines</div> 
+            <div className="absolute top-0 right-0 p-2">
+              <AddDeadline />
+            </div>
               <div className="w-full mt-10">
                 <Deadlines />
               </div>

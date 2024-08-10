@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { ArrowRight } from 'lucide-react';
 
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -32,7 +31,7 @@ const Hero = () => {
         <div className="center card-wrapper h-[50px] w-[150px]">
           <div className="center card-content text-sm hover:text-secondary_color">
             Get Started
-            <FontAwesomeIcon icon={faArrowRight} className='ml-2' />
+            <ArrowRight size={20} className='ml-1'/>
           </div>
         </div>
       </Link>
