@@ -114,10 +114,10 @@ const DummyData = [
   },
 ];
 
-const Deadlines = () => {
+const Deadlines = ({ rowsPerPage }) => {
   return (
     <div className='container mx-auto py-10'>
-      <DataTable columns={DeadlineColumn} data={DummyData} />
+      <DataTable columns={DeadlineColumn} data={DummyData} initialPageSize={rowsPerPage} />
     </div>
   )
 }

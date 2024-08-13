@@ -1,12 +1,11 @@
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
 import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-
+} from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -14,23 +13,33 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
-import { useState } from "react"
+const DataTable = ({ columns, data, initialPageSize }) => {
+  const [sorting, setSorting] = useState([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: initialPageSize,
+  });
 
-const DataTable = ({ columns, data }) => {
-  const [sorting, setSorting] = useState([])
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, pageSize: initialPageSize }));
+  }, [initialPageSize, pagination.pageSize]);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
+    onPaginationChange: setPagination,
     getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
+      pagination,
     },
-  })
+  });
 
   return (
     <div>
@@ -49,7 +58,7 @@ const DataTable = ({ columns, data }) => {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -97,7 +106,7 @@ const DataTable = ({ columns, data }) => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default DataTable;
