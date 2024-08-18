@@ -13,7 +13,7 @@ const Dashboard = () => {
     const updateRowsPerPage = () => {
       if (deadlinesRef.current) {
         const elementHeight = deadlinesRef.current.clientHeight;
-        const rowHeight = 80; // Adjust this value according to your row height
+        const rowHeight = 100; // Adjust this value according to your row height
         const calculatedRows = Math.floor(elementHeight / rowHeight);
 
         setRowsPerPage(calculatedRows);
@@ -34,13 +34,13 @@ const Dashboard = () => {
     <section className="h-screen w-full flex">
       <Sidebar />
       <div className="size-full grid gap-4 grid-rows-4 grid-cols-10 p-4">
-        <div className="col-span-5 row-span-3 center glass rounded-3xl p-4">
+        <div className="col-span-5 row-span-2 center glass rounded-3xl p-4">
           <div className="absolute top-0 right-0 p-2">
             <AddCourse />
           </div>
           <CourseCard />
         </div>
-        <div className="flex flex-col col-span-5 row-span-2 center glass rounded-3xl p-2" ref={deadlinesRef}>
+        <div className="flex flex-col col-span-5 row-span-3 center glass rounded-3xl p-2" ref={deadlinesRef}>
           <div className="absolute top-5 left-auto">Deadlines</div> 
           <div className="absolute top-0 right-0 p-2">
             <AddDeadline />
