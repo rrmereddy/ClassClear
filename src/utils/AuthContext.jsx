@@ -131,9 +131,9 @@ export const AuthProvider = ({children}) => {
 
     async function handleAddCourse(courseData) {
         try {
-            const { courseName, universityName, courseInstructor, courseDescription } = courseData;
+            const { course_name, university_name, instructor_name, syllabus_file } = courseData;
             const response = await axiosJWT.post("http://localhost:5001/courses", 
-                { courseName, universityName, courseInstructor, courseDescription },
+                { course_name, university_name, instructor_name, syllabus_file },
                 {
                     headers: {
                         authorization: "Bearer " + user.accessToken,
@@ -156,9 +156,9 @@ export const AuthProvider = ({children}) => {
 
     async function handleDeleteCourse(courseData) {
         try {
-            const { courseName, universityName, courseInstructor, courseDescription } = courseData;
+            const { course_name, university_name, instructor_name } = courseData;
             const response = await axiosJWT.delete("http://localhost:5001/deletecourse", {
-                data: { courseName, universityName, courseInstructor, courseDescription },
+                data: { course_name, university_name, instructor_name },
                 headers: {
                     authorization: "Bearer " + user.accessToken,
                 },

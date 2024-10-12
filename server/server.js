@@ -209,26 +209,6 @@ app.post("/logout", verify, async (req, res) => {
   ]);
 });
 
-app.post("/getcourses", verify, async (req, res) => {
-  const { accessToken } = req.body;
-  const decodedPayload = jwtDecode(accessToken);
-  const email = decodedPayload.email;
-  try {
-    let user_id = await db.query("SELECT * FROM users WHERE email=$1", [email]);
-    user_id = user_id.rows[0].id;
-    let course_info = await db.query(
-      "SELECT name,university_name,course_description,course_instructor FROM syllabus_metadata WHERE user_id=$1",
-      [user_id]
-    );
-
-    course_info = course_info.rows;
-    res.status(200).send({ courses: course_info });
-  } catch (err) {
-    console.error(err);
-    res.status(400).send({ error: err });
-  }
-});
-
 app.get("/universitynames", async (req, res) => {
   const { search } = req.body;
   try {
@@ -327,21 +307,22 @@ app.get("/auth/google/redirect", (req, res, next) => {
 });
 
 app.post("/courses", verify, async (req, res) => {
-  const { courseName, universityName, courseInstructor, courseDescription } =
+  const { course_name, university_name, instructor_name, syllabus_file } =
     req.body;
+    console.log(req.body);
   try {
     const user_id = await db.query("SELECT * FROM users where email=$1", [
       req.user.email,
     ]);
 
     await db.query(
-      "INSERT INTO syllabus_metadata (name, university_name, user_id, course_instructor, course_description) VALUES ($1, $2, $3, $4, $5)",
+      "INSERT INTO syllabus_metadata (course_name, university_name, instructor_name, syllabus_file, user_id) VALUES ($1, $2, $3, $4, $5)",
       [
-        courseName,
-        universityName,
+        course_name,
+        university_name,
+        instructor_name,
+        syllabus_file,
         user_id.rows[0].id,
-        courseInstructor,
-        courseDescription,
       ]
     );
 
@@ -349,6 +330,26 @@ app.post("/courses", verify, async (req, res) => {
   } catch (err) {
     res.status(400).send({ error: "Error ocurred" });
     console.error(err);
+  }
+});
+
+app.post("/getcourses", verify, async (req, res) => {
+  const { accessToken } = req.body;
+  const decodedPayload = jwtDecode(accessToken);
+  const email = decodedPayload.email;
+  try {
+    let user_id = await db.query("SELECT * FROM users WHERE email=$1", [email]);
+    user_id = user_id.rows[0].id;
+    let course_info = await db.query(
+      "SELECT course_name, university_name, instructor_name FROM syllabus_metadata WHERE user_id=$1",
+      [user_id]
+    );
+
+    course_info = course_info.rows;
+    res.status(200).send({ courses: course_info });
+  } catch (err) {
+    console.error(err);
+    res.status(400).send({ error: err });
   }
 });
 

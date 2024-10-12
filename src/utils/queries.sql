@@ -6,16 +6,14 @@ CREATE TABLE users (
 );
 
 CREATE TABLE syllabus_metadata (
-    id PRIMARY KEY NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    university_name TEXT,
+    id SERIAL PRIMARY KEY,  -- Automatically incrementing ID
+	course_name TEXT NOT Null,
+    university_name TEXT NOT NULL,
+	instructor_name TEXT NOT Null,
+	syllabus_file BYTEA,  -- Column to store the PDF file in binary format
     user_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
-ALTER TABLE syllabus_metadata
-ADD COLUMN course_instructor VARCHAR(255),
-ADD COLUMN course_description TEXT
 
 CREATE TYPE cat AS ENUM ('Exam', 'Project', 'Homework');
 

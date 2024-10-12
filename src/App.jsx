@@ -4,7 +4,6 @@ import Login from './pages/Login';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
-import Search from './pages/Search';
 import { SidebarProvider } from './components/SideBarComp/SidebarContext';
 import PrivateRoutes from './utils/PrivateRoutes';
 import { AuthProvider } from './utils/AuthContext';

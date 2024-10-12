@@ -2,54 +2,47 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { useAuth } from "@/utils/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
-import './CoursesComp.css';
+import { Plus } from "lucide-react";
 
-const AddCourse = () => {
+const UploadSyllabus = () => {
   const [course, setCourse] = useState({
-    course_name: '',
-    university_name: '',
-    instructor_name: '',
-    syllabus_file: null,
+    courseName: '',
+    universityName: '',
+    courseInstructor: '',
+    courseDescription: ''
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
-  const { handleAddCourse } = useAuth();
+
+  const { handleUploadSyllabus } = useAuth();
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    if (!course.course_name || !course.university_name || !course.instructor_name) {
+    if (!course.courseName || !course.universityName || !course.courseInstructor || !course.courseDescription) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please fill in all fields",
         status: "error",
-        style: { borderColor: 'red' },
+        style: { borderColor: 'red' } // Custom border color for error
       });
       return;
     }
 
-    if (course.syllabus_file && course.syllabus_file.type !== "application/pdf") {
-      toast({
-        title: "Error",
-        description: "Only PDF files are allowed.",
-        status: "error",
-        style: { borderColor: 'red' },
-      });
-      return;
-    }
-    console.log(course);
-    const result = await handleAddCourse(course);
+
+    const result = await handleUploadSyllabus(course);
     if (result.error) {
       toast({
         title: "Error",
@@ -62,28 +55,24 @@ const AddCourse = () => {
         title: "Success",
         description: result.success,
         status: "success",
-        style: { borderColor: 'green' },
+        style: { borderColor: 'green' } // Custom border color for success
       });
       setIsDialogOpen(false);
     }
-  };
+  }
 
   const handleCourseChange = (e) => {
-    if (e.target.name === 'syllabus_file') {
-      setCourse(prev => ({ ...prev, [e.target.name]: e.target.files[0] }));
-    } else {
-      setCourse(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    }
-  };
+    setCourse(prev=>({ ...prev, [e.target.name]: e.target.value }));
+  }
 
   const handleDialogClose = () => {
     setCourse({
-      course_name: '',
-      university_name: '',
-      instructor_name: '',
-      syllabus_file: null,
+      courseName: '',
+      universityName: '',
+      courseInstructor: '',
+      courseDescription: ''
     });
-  };
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={(open) => {
@@ -92,14 +81,14 @@ const AddCourse = () => {
         handleDialogClose();
       }
     }}>
-      <DialogTrigger asChild>
-        <Button variant="outline" onClick={() => setIsDialogOpen(true)}>Add Course</Button>
+      <DialogTrigger asChild className="opacity-0 group-hover:opacity-100 transition-opacity duration-100 absolute bottom-2 right-8 cursor-pointer">
+        <Plus className="w-6 h-6" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add a Course</DialogTitle>
           <DialogDescription>
-            Be as specific as possible when adding a course.
+            Be as specific as possible when adding a course. Other users can also add the same course.
           </DialogDescription>
         </DialogHeader>
         <form action="submit" onSubmit={handleFormSubmit}>
@@ -112,7 +101,7 @@ const AddCourse = () => {
                 id="course"
                 placeholder="CSCE-120"
                 className="col-span-3"
-                name="course_name"
+                name="courseName"
                 onChange={handleCourseChange}
               />
             </div>
@@ -124,7 +113,7 @@ const AddCourse = () => {
                 id="university"
                 placeholder="Texas A&M University"
                 className="col-span-3"
-                name="university_name"
+                name="universityName"
                 onChange={handleCourseChange}
               />
             </div>
@@ -136,20 +125,19 @@ const AddCourse = () => {
                 id="instructor"
                 placeholder="Pedro Duarte"
                 className="col-span-3"
-                name="instructor_name"
+                name="courseInstructor"
                 onChange={handleCourseChange}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="file" className="text-right">
-                Upload Syllabus
+              <Label htmlFor="description" className="text-right">
+                Description
               </Label>
-              <Input
-                id="file"
-                type="file"
-                accept=".pdf" // Only PDF files are allowed
-                className="col-span-3 file-input"
-                name="syllabus_file"
+              <Textarea
+                id="description"
+                placeholder="This is a course about computer science."
+                className="col-span-3"
+                name="courseDescription"
                 onChange={handleCourseChange}
               />
             </div>
@@ -160,7 +148,7 @@ const AddCourse = () => {
         </form>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default AddCourse;
+export default UploadSyllabus;
