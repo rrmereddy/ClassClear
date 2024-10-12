@@ -352,6 +352,30 @@ app.post("/courses", verify, async (req, res) => {
   }
 });
 
+app.delete("/deletecourse", verify, async (req, res) => {
+  const { courseName, universityName } = req.body;
+  
+  try {
+    const user_id = await db.query("SELECT * FROM users WHERE email=$1", [
+      req.user.email,
+    ]);
+
+    await db.query(
+      "DELETE FROM syllabus_metadata WHERE name=$1 AND university_name=$2 AND user_id=$3",
+      [
+        courseName,
+        universityName,
+        user_id.rows[0].id,
+      ]
+    );
+
+    res.status(200).send({ message: "Successfully deleted course!" });
+  } catch (err) {
+    res.status(400).send({ error: "Error occurred while deleting the course" });
+    console.error(err);
+  }
+});
+
 passport.use(
   "local",
   new Strategy({ usernameField: "email" }, async (username, password, cb) => {

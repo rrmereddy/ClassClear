@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import DeleteCourse from "./DeleteCourse";
 
 function CourseCardList({ courses }) {
     return (
@@ -11,12 +11,7 @@ function CourseCardList({ courses }) {
                     <div className="mb-2 font-bold">Course: {course.name}</div>
                     <div className="mb-2">University: {course.university_name}</div>
                     <div className="mb-2">Instructor: {course.course_instructor}</div>
-                    <button
-                        onClick={() => console.log("Delete")}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-100 absolute bottom-2 right-2"
-                    >
-                        <Trash2 size={20} className="text-red-500" />
-                    </button>
+                    <DeleteCourse course={course} />
                 </div>
             ))}
         </div>

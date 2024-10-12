@@ -42,13 +42,13 @@ const AddCourse = () => {
 
 
     const result = await handleAddCourse(course);
-
+    console.log(course);
     if (result.error) {
       toast({
         title: "Error",
+        variant: "destructive",
         description: result.error,
         status: "error",
-        style: { borderColor: 'red' } // Custom border color for error
       });
     } else {
       toast({

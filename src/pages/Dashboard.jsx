@@ -39,13 +39,12 @@ const Dashboard = () => {
       }
     };
 
-    // Initial calculation
+
     updateRowsPerPage();
 
-    // Add a resize listener to update rows per page when the window size changes
     window.addEventListener("resize", updateRowsPerPage);
 
-    // Cleanup listener on unmount
+
     return () => window.removeEventListener("resize", updateRowsPerPage);
   }, [coursesPerPage]);
 

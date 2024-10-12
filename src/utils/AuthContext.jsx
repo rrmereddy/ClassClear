@@ -154,6 +154,29 @@ export const AuthProvider = ({children}) => {
         }
     }
 
+    async function handleDeleteCourse(courseData) {
+        try {
+            const { courseName, universityName, courseInstructor, courseDescription } = courseData;
+            const response = await axiosJWT.delete("http://localhost:5001/deletecourse", {
+                data: { courseName, universityName, courseInstructor, courseDescription },
+                headers: {
+                    authorization: "Bearer " + user.accessToken,
+                },
+                withCredentials: true,
+            });
+    
+            if (response.data.error) {
+                return { error: response.data.error };
+            } else {
+                return { success: response.data.message };
+            }
+    
+        } catch (err) {
+            console.error(err);
+            return { error: "An error occurred while deleting the course." };
+        }
+    }
+
     async function getCourses() {
         const res = await axiosJWT.post("http://localhost:5001/getcourses", 
             {accessToken: user.accessToken}, 
@@ -195,6 +218,7 @@ export const AuthProvider = ({children}) => {
         user,
         loginUser,
         handleAddCourse,
+        handleDeleteCourse,
         handleAuthContext,
         logoutUser,
         signUpUser,

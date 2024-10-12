@@ -31,7 +31,6 @@ function App() {
                     <Route element={<PrivateRoutes />}>
                       <Route path='/dashboard' element={<Dashboard />} />
                       <Route path='/courses' element={<Courses />} />
-                      <Route path='/search' element={<Search />} />
                     </Route>
                     <Route path='*' element={<h1>404 Not Found</h1>} />
                   </Routes>
