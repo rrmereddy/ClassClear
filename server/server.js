@@ -376,6 +376,74 @@ app.delete("/deletecourse", verify, async (req, res) => {
   }
 });
 
+app.post("/getdeadlines", verify, async (req, res) => {
+  const { accessToken } = req.body;
+  const decodedPayload = jwtDecode(accessToken);
+  const email = decodedPayload.email;
+  try {
+    let user_id = await db.query("SELECT * FROM users WHERE email=$1", [email]);
+    user_id = user_id.rows[0].id;
+    let deadline_info = await db.query(
+      "SELECT course_name,category,due_date FROM deadlines WHERE user_id=$1",
+      [user_id]
+    );
+
+    deadline_info = deadline_info.rows;
+    res.status(200).send({ deadlines: deadline_info });
+  } catch (err) {
+    console.error(err);
+    res.status(400).send({ error: err });
+  }
+});
+
+app.post("/deadlines", verify, async (req, res) => {
+  const { category, courseName, dueDate } = req.body;
+  try {
+    const user_id = await db.query("SELECT * FROM users WHERE email=$1", [
+      req.user.email,
+    ]);
+
+    await db.query(
+      "INSERT INTO deadlines (course_name, category, due_date, user_id) VALUES ($1, $2, $3, $4)",
+      [
+        courseName,
+        category,
+        dueDate,
+        user_id.rows[0].id
+      ]
+    )
+
+    res.status(200).send({ message: "Successfully added deadline!" });
+  } catch (err) {
+    res.status(400).send({ error: "Error ocurred" });
+    console.error(err);
+  }
+});
+
+app.delete("/deletedeadline", verify, async (req, res) => {
+  const { category, course_name } = req.body;
+  
+  try {
+    const user_id = await db.query("SELECT * FROM users WHERE email=$1", [
+      req.user.email,
+    ]);
+
+    await db.query(
+      "DELETE FROM deadlines WHERE course_name=$1 AND category=$2 AND user_id=$3",
+      [
+        course_name,
+        category,
+        user_id.rows[0].id,
+      ]
+    );
+
+    res.status(200).send({ message: "Successfully deleted deadline!" });
+  } catch (err) {
+    res.status(400).send({ error: "Error occurred while deleting the deadline" });
+    console.error(err);
+  }
+});
+
 passport.use(
   "local",
   new Strategy({ usernameField: "email" }, async (username, password, cb) => {

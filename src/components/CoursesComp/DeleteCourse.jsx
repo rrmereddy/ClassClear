@@ -45,6 +45,7 @@ const DeleteCourse = (courseToDelete) => {
 
   return (
     <AlertDialog>
+
       <AlertDialogTrigger className="opacity-0 group-hover:opacity-100 transition-opacity duration-100 absolute bottom-2 right-2">
           <Trash2 size={20} className="text-red-500" />
       </AlertDialogTrigger>

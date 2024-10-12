@@ -177,6 +177,54 @@ export const AuthProvider = ({children}) => {
         }
     }
 
+    async function handleAddDeadline(deadlineData) {
+        try {
+            const { courseName, category, dueDate } = deadlineData;
+            const response = await axiosJWT.post("http://localhost:5001/deadlines", 
+                { courseName, category, dueDate },
+                {
+                    headers: {
+                        authorization: "Bearer " + user.accessToken,
+                    },
+                    withCredentials: true,
+                }
+            );
+    
+            if (response.data.error) {
+                return { error: response.data.error };
+            } else {
+                return { success: "Deadline Added!" };
+            }
+    
+        } catch (err) {
+            console.error(err);
+            return { error: "An error occurred while adding the deadline." };
+        }
+    }
+
+    async function handleDeleteDeadline(deadlineData) {
+        try {
+            const { course_name, category, dueDate } = deadlineData;
+            const response = await axiosJWT.delete("http://localhost:5001/deletedeadline", {
+                data: { course_name, category, dueDate },
+                headers: {
+                    authorization: "Bearer " + user.accessToken,
+                },
+                withCredentials: true,
+            });
+    
+            if (response.data.error) {
+                return { error: response.data.error };
+            } else {
+                return { success: response.data.message };
+            }
+    
+        } catch (err) {
+            console.error(err);
+            return { error: "An error occurred while deleting the deadline." };
+        }
+    }
+
     async function getCourses() {
         const res = await axiosJWT.post("http://localhost:5001/getcourses", 
             {accessToken: user.accessToken}, 
@@ -194,6 +242,26 @@ export const AuthProvider = ({children}) => {
         } else {
             const courses = (res.data.courses);
             return courses;
+        }
+    }
+
+    async function getDeadlines() {
+        const res = await axiosJWT.post("http://localhost:5001/getdeadlines", 
+            {accessToken: user.accessToken}, 
+            {
+                headers: {
+                    authorization: "Bearer " + user.accessToken,
+                },
+                withCredentials: true,
+            }
+        )
+
+        if (res.data.error) {
+            alert("There was an issue fetching your deadlines");
+            return;
+        } else {
+            const deadlines = (res.data.deadlines);
+            return deadlines;
         }
     }
 
@@ -219,10 +287,13 @@ export const AuthProvider = ({children}) => {
         loginUser,
         handleAddCourse,
         handleDeleteCourse,
+        handleAddDeadline,
+        handleDeleteDeadline,
         handleAuthContext,
         logoutUser,
         signUpUser,
         getCourses,
+        getDeadlines, 
         getUniversityNames, //function gets university names according to search parameter passed in
         error
     }

@@ -20,8 +20,9 @@ ADD COLUMN course_description TEXT
 CREATE TYPE cat AS ENUM ('Exam', 'Project', 'Homework');
 
 CREATE TABLE deadlines (
-    syllabus_metadata_id INTEGER NOT NULL,
-    category cat NOT NULL,
+    course_name VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
     due_date TIMESTAMPTZ,
-    FOREIGN KEY(syllabus_metadata_id) REFERENCES syllabus_metadata(id)
+    user_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );

@@ -29,6 +29,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { useAuth } from "@/utils/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 const AddDeadline = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,10 +41,37 @@ const AddDeadline = () => {
   });
   const [date, setDate] = useState(new Date());
 
+  const { handleAddDeadline } = useAuth();
+  const { toast } = useToast();
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setDeadline(prev=>({ ...prev, dueDate: date }));
-    console.log(deadline);
+    
+    if(!deadline.courseName || !deadline.category || !deadline.dueDate) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        status: "error",
+        style: { borderColor: 'red' } // Custom border color for error
+      });
+      return;
+    }
+
+    const result = await handleAddDeadline(deadline);
+    if (result.error) {
+      toast({
+        title: "Error",
+        description: result.error,
+        status: "error",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: result.success,
+        status: "success",
+      });
+    }
     setIsDialogOpen(false);
   }
   const handleDialogClose = () => {

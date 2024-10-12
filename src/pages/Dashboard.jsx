@@ -67,7 +67,9 @@ const Dashboard = () => {
           <Deadlines rowsPerPage={rowsPerPage} />
         </div>
       </div>
-      <div className="col-span-5 row-span-1 center glass rounded-3xl p-4">Other Features</div>
+      <div className="col-span-5 row-span-1 center glass rounded-3xl p-4">
+        Other Features
+      </div>
       <div className="col-span-10 row-span-4 center glass rounded-3xl p-4">Other Features</div>
     </div>
   </section>) : (<MobileSidebar/>);
