@@ -309,7 +309,6 @@ app.get("/auth/google/redirect", (req, res, next) => {
 app.post("/courses", verify, async (req, res) => {
   const { course_name, university_name, instructor_name, syllabus_file } =
     req.body;
-    console.log(req.body);
   try {
     const user_id = await db.query("SELECT * FROM users where email=$1", [
       req.user.email,
@@ -354,18 +353,20 @@ app.post("/getcourses", verify, async (req, res) => {
 });
 
 app.delete("/deletecourse", verify, async (req, res) => {
-  const { courseName, universityName } = req.body;
+  const { course_name, university_name, instructor_name, } = req.body;
   
   try {
     const user_id = await db.query("SELECT * FROM users WHERE email=$1", [
       req.user.email,
     ]);
+    console.log(req.body)
 
     await db.query(
-      "DELETE FROM syllabus_metadata WHERE name=$1 AND university_name=$2 AND user_id=$3",
+      "DELETE FROM syllabus_metadata WHERE course_name=$1 AND university_name=$2 AND instructor_name=$3 AND user_id=$4",
       [
-        courseName,
-        universityName,
+        course_name,
+        university_name,
+        instructor_name,
         user_id.rows[0].id,
       ]
     );

@@ -15,11 +15,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 
 const DeleteCourse = (courseToDelete) => {
+  console.log(courseToDelete)
   const [course, setCourse] = useState({
-    courseName: courseToDelete['course']['name'],
-    universityName: courseToDelete['course']['university_name'],
-    courseInstructor: courseToDelete['course']['course_description'],
-    courseDescription: courseToDelete['course']['course_instructor']
+    course_name: courseToDelete['course']['course_name'],
+    university_name: courseToDelete['course']['university_name'],
+    instructor_name: courseToDelete['course']['instructor_name'],
   });
 
   const { toast } = useToast();
