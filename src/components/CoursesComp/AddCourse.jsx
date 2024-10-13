@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { useAuth } from "@/utils/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import './CoursesComp.css';
 
 const AddCourse = () => {
@@ -21,6 +23,7 @@ const AddCourse = () => {
     university_name: '',
     instructor_name: '',
     syllabus_file: null,
+    syllabus_text: '',
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -48,6 +51,7 @@ const AddCourse = () => {
       });
       return;
     }
+
     console.log(course);
     const result = await handleAddCourse(course);
     if (result.error) {
@@ -82,6 +86,7 @@ const AddCourse = () => {
       university_name: '',
       instructor_name: '',
       syllabus_file: null,
+      syllabus_text: '',
     });
   };
 
@@ -140,19 +145,36 @@ const AddCourse = () => {
                 onChange={handleCourseChange}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="file" className="text-right">
-                Upload Syllabus
-              </Label>
-              <Input
-                id="file"
-                type="file"
-                accept=".pdf" // Only PDF files are allowed
-                className="col-span-3 file-input"
-                name="syllabus_file"
-                onChange={handleCourseChange}
-              />
+
+            <div className="grid grid-cols-6 items-center gap-4">
+              <Tabs defaultValue="Upload PDF" className="col-span-6">
+                <TabsList>
+                  <TabsTrigger value="Upload PDF">Upload PDF</TabsTrigger>
+                  <TabsTrigger value="Upload Text">Upload Text</TabsTrigger>
+                </TabsList>
+                <TabsContent value="Upload PDF">
+                <Input
+                    id="file"
+                    type="file"
+                    accept=".pdf"
+                    className="col-span-3 file-input h-12"
+                    name="syllabus_file"
+                    onChange={handleCourseChange}
+                  />
+                </TabsContent>
+                <TabsContent value="Upload Text">
+                <Textarea
+                    id="syllabus"
+                    placeholder="Enter syllabus details"
+                    className="col-span-3 input-textarea"
+                    name="syllabus_text"
+                    onChange={handleCourseChange}
+                    rows={4}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
+
           </div>
           <DialogFooter>
             <Button type="submit">Add Course</Button>

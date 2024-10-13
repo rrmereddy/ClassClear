@@ -307,7 +307,7 @@ app.get("/auth/google/redirect", (req, res, next) => {
 });
 
 app.post("/courses", verify, async (req, res) => {
-  const { course_name, university_name, instructor_name, syllabus_file } =
+  const { course_name, university_name, instructor_name, syllabus_file, syllabus_text } =
     req.body;
   try {
     const user_id = await db.query("SELECT * FROM users where email=$1", [
@@ -315,13 +315,14 @@ app.post("/courses", verify, async (req, res) => {
     ]);
 
     await db.query(
-      "INSERT INTO syllabus_metadata (course_name, university_name, instructor_name, syllabus_file, user_id) VALUES ($1, $2, $3, $4, $5)",
+      "INSERT INTO syllabus_metadata (course_name, university_name, instructor_name, syllabus_file, user_id, syllabus_text) VALUES ($1, $2, $3, $4, $5, $6)",
       [
         course_name,
         university_name,
         instructor_name,
         syllabus_file,
         user_id.rows[0].id,
+        syllabus_text,
       ]
     );
 
@@ -340,7 +341,7 @@ app.post("/getcourses", verify, async (req, res) => {
     let user_id = await db.query("SELECT * FROM users WHERE email=$1", [email]);
     user_id = user_id.rows[0].id;
     let course_info = await db.query(
-      "SELECT course_name, university_name, instructor_name FROM syllabus_metadata WHERE user_id=$1",
+      "SELECT course_name, university_name, instructor_name, syllabus_file, syllabus_text FROM syllabus_metadata WHERE user_id=$1",
       [user_id]
     );
 
@@ -359,7 +360,6 @@ app.delete("/deletecourse", verify, async (req, res) => {
     const user_id = await db.query("SELECT * FROM users WHERE email=$1", [
       req.user.email,
     ]);
-    console.log(req.body)
 
     await db.query(
       "DELETE FROM syllabus_metadata WHERE course_name=$1 AND university_name=$2 AND instructor_name=$3 AND user_id=$4",

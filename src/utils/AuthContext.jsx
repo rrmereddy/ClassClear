@@ -131,9 +131,9 @@ export const AuthProvider = ({children}) => {
 
     async function handleAddCourse(courseData) {
         try {
-            const { course_name, university_name, instructor_name, syllabus_file } = courseData;
+            const { course_name, university_name, instructor_name, syllabus_file, syllabus_text } = courseData;
             const response = await axiosJWT.post("http://localhost:5001/courses", 
-                { course_name, university_name, instructor_name, syllabus_file },
+                { course_name, university_name, instructor_name, syllabus_file, syllabus_text },
                 {
                     headers: {
                         authorization: "Bearer " + user.accessToken,
