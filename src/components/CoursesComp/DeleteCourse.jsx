@@ -15,7 +15,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 
 const DeleteCourse = (courseToDelete) => {
-  console.log(courseToDelete)
   const [course, setCourse] = useState({
     course_name: courseToDelete['course']['course_name'],
     university_name: courseToDelete['course']['university_name'],

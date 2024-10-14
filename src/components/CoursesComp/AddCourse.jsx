@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload, FileText } from "lucide-react";
+import FileProcessing from '../FileProcessing'; // Import the new component
 import './CoursesComp.css';
 
 // Define the schema for validation using zod
@@ -33,6 +34,7 @@ const schema = z.object({
 const AddCourse = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState("Upload PDF");
+  const [isProcessing, setIsProcessing] = useState(false); // New state to track processing
   const { toast } = useToast();
   const { handleAddCourse } = useAuth();
 
@@ -51,7 +53,7 @@ const AddCourse = () => {
     const { syllabus_file, syllabus_text, ...rest } = data;
 
     // Validate syllabus file type if PDF is uploaded
-    if (tabValue === "Upload PDF" && syllabus_file?.[0]?.type !== "application/pdf") {
+    if (tabValue === "Upload PDF" && syllabus_file?.[0]?.type !== "application/pdf" && syllabus_file?.[0]) {
       toast({
         title: "Error",
         description: "Only PDF files are allowed.",
@@ -61,30 +63,38 @@ const AddCourse = () => {
       return;
     }
 
-    const courseData = {
-      ...rest,
-      syllabus_file: tabValue === "Upload PDF" ? syllabus_file?.[0] : null,
-      syllabus_text: tabValue === "Upload Text" ? syllabus_text : "",
-    };
+    setIsProcessing(true); // Start processing
 
-    const result = await handleAddCourse(courseData);
-    if (result.error) {
-      toast({
-        title: "Error",
-        variant: "destructive",
-        description: result.error,
-        status: "error",
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: result.success,
-        status: "success",
-        style: { borderColor: 'green' },
-      });
-      setIsDialogOpen(false);
-      reset();
-    }
+    // Simulate file upload completion after 5 seconds
+    setTimeout(async () => {
+      const courseData = {
+        ...rest,
+        syllabus_file: tabValue === "Upload PDF" ? syllabus_file?.[0] : null,
+        syllabus_text: tabValue === "Upload Text" ? syllabus_text : "",
+      };
+
+      console.log(courseData);
+
+      const result = await handleAddCourse(courseData);
+      if (result.error) {
+        toast({
+          title: "Error",
+          variant: "destructive",
+          description: result.error,
+          status: "error",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: result.success,
+          status: "success",
+          style: { borderColor: 'green' },
+        });
+        setIsDialogOpen(false);
+        reset();
+      }
+      setIsProcessing(false); // End processing
+    }, 5000);
   };
 
   const handleDialogClose = () => {
@@ -205,6 +215,10 @@ const AddCourse = () => {
             <Button type="submit">Add Course</Button>
           </DialogFooter>
         </form>
+
+        {/* Show the FileProcessing component when file is being processed */}
+        {isProcessing && <FileProcessing onComplete={() => setIsProcessing(false)} />}
+        
       </DialogContent>
     </Dialog>
   );
