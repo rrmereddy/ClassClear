@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Upload, FileText } from "lucide-react";
 import './CoursesComp.css';
 
 // Define the schema for validation using zod
@@ -40,6 +41,7 @@ const AddCourse = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
     reset,
   } = useForm({
     resolver: zodResolver(schema),
@@ -160,13 +162,32 @@ const AddCourse = () => {
                   <TabsTrigger value="Upload Text" onClick={() => setTabValue("Upload Text")}>Upload Text</TabsTrigger>
                 </TabsList>
                 <TabsContent value="Upload PDF">
-                  <Input
-                    id="file"
-                    type="file"
-                    accept=".pdf"
-                    className="col-span-3 file-input h-12"
-                    {...register("syllabus_file")}
-                  />
+                <div className="flex items-center justify-center w-full">
+                    <label htmlFor="file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-zinc-800 border-dashed rounded-lg cursor-pointer bg-transparent hover:border-secondary_color transition duration-200">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <Upload className="w-10 h-10 mb-3 text-gray-400" />
+                        <p className="mb-2 text-sm text-gray-500">
+                          <span className="font-semibold">Click to upload</span> or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-500">PDF ONLY (MAX. 10MB)</p>
+                      </div>
+                      <Input
+                            id="file"
+                            type="file"
+                            accept=".pdf"
+                            className="hidden"
+                            {...register("syllabus_file")}
+                          />
+                    </label>
+                  </div>
+                    {/* Directly accessing file from form data */}
+                    {watch("syllabus_file")?.[0] && (
+                      <div className="flex items-center space-x-2 text-sm text-white">
+                        <FileText className="w-4 h-4" />
+                        <span>{watch("syllabus_file")[0].name}</span>
+                      </div>
+                    )}
+
                 </TabsContent>
                 <TabsContent value="Upload Text">
                   <Textarea
