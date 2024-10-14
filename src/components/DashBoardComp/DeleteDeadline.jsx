@@ -10,22 +10,14 @@ import {
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog";
   import { Trash2 } from "lucide-react";
-  import { useAuth } from "@/utils/AuthContext";
   import { useToast } from "@/components/ui/use-toast";
-  import { useState } from "react";
   
-  const DeleteDeadline = (deadline) => { 
-    
-    const [deadlineData, setDeadlineData] = useState({
-      course_name: deadline['deadline']['course_name'],
-      category: deadline['deadline']['category'],
-      dueDate: deadline['deadline']['due_date'],
-    });
+  const DeleteDeadline = ({ deadline, onDeleteDeadline }) => { 
+
     const { toast } = useToast();
-    const { handleDeleteDeadline } = useAuth();
   
     const handleDeleteDeadlineCallback = async () => {
-      const response = await handleDeleteDeadline(deadlineData);
+      const response = await onDeleteDeadline(deadline);
       if (response.success) {
         toast({
           title: "Course Deleted",

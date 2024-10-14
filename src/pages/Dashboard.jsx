@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import Sidebar from "../components/SideBarComp/Sidebar";
-import Deadlines from "../components/DashBoardComp/Deadlines";
 import CoursesManager from "@/components/CourseManager";
-import AddDeadline from "@/components/CoursesComp/AddDeadline";
 import MobileSidebar from "@/components/SideBarComp/MobileSidebar";
+import DeadlineManager from "@/components/DeadlineManager";
 
 const Dashboard = () => {
   const deadlinesRef = useRef(null);
@@ -56,11 +55,9 @@ const Dashboard = () => {
       </div>
       <div className="flex flex-col col-span-5 row-span-3 center glass rounded-3xl p-2" ref={deadlinesRef}>
         <div className="absolute top-5 left-auto">Deadlines</div> 
-        <div className="absolute top-0 right-0 p-2">
-          <AddDeadline />
-        </div>
+
         <div className="w-full mt-10">
-          <Deadlines rowsPerPage={rowsPerPage} />
+          <DeadlineManager count={rowsPerPage} />
         </div>
       </div>
       <div className="col-span-5 row-span-1 center glass rounded-3xl p-4">

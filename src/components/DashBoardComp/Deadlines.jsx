@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react"
 import DataTable from "./DataTable"
 import { useAuth } from "@/utils/AuthContext"
-import DeadlineColumn from "./DeadlineColumns"
-
-const Deadlines = ({ rowsPerPage }) => {
+const Deadlines = ({ deadlineColumns, deadlinesPerPage, refreshTrigger }) => {
 
   const { getDeadlines } = useAuth()
   const [deadlines, setDeadlines] = useState([])
@@ -18,11 +16,11 @@ const Deadlines = ({ rowsPerPage }) => {
       }
     }
     fetchDeadlines()
-  }, [getDeadlines])
+  }, [getDeadlines, refreshTrigger])
 
   return (
     <div className='container mx-auto py-10'>
-      <DataTable columns={DeadlineColumn} data={deadlines} initialPageSize={rowsPerPage} />
+      <DataTable columns={deadlineColumns} data={deadlines} initialPageSize={deadlinesPerPage}/>
     </div>
   )
 }
