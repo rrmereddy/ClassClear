@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Sidebar from "../components/SideBarComp/Sidebar";
 import Deadlines from "../components/DashBoardComp/Deadlines";
-import AddCourse from "@/components/CoursesComp/AddCourse";
-import PaginatedCourses from "@/components/CoursesComp/PaginatedCourses";
+import CoursesManager from "@/components/CourseManager";
 import AddDeadline from "@/components/CoursesComp/AddDeadline";
 import MobileSidebar from "@/components/SideBarComp/MobileSidebar";
 
@@ -53,10 +52,7 @@ const Dashboard = () => {
     <Sidebar />
     <div className="size-full grid gap-4 grid-rows-4 grid-cols-10 p-4">
       <div className="col-span-5 row-span-2 center glass rounded-3xl p-4" ref={coursesRef}>
-        <div className="absolute top-0 right-0 p-2">
-          <AddCourse />
-        </div>
-        <PaginatedCourses coursesPerPage={coursesPerPage} />
+        <CoursesManager count={coursesPerPage} />
       </div>
       <div className="flex flex-col col-span-5 row-span-3 center glass rounded-3xl p-2" ref={deadlinesRef}>
         <div className="absolute top-5 left-auto">Deadlines</div> 

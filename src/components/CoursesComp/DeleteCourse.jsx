@@ -10,35 +10,17 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Trash2 } from "lucide-react";
-import { useAuth } from "@/utils/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 
-const DeleteCourse = (courseToDelete) => {
-  const [course, setCourse] = useState({
-    course_name: courseToDelete['course']['course_name'],
-    university_name: courseToDelete['course']['university_name'],
-    instructor_name: courseToDelete['course']['instructor_name'],
-  });
 
-  const { toast } = useToast();
-  const { handleDeleteCourse } = useAuth();
+const DeleteCourse = ({ course, onDeleteCourse }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const  handleDeleteCourseCallback = async () => {
 
-    const response = await handleDeleteCourse(course);
-    if (response.success) {
-      toast({
-        title: "Course Deleted",
-        description: response.success,
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Course Not Deleted",
-        description: response.error,
-      });
-    }
+    setIsDeleting(true);
+    await onDeleteCourse(course);
+    setIsDeleting(false);
   }
 
 
@@ -58,7 +40,9 @@ const DeleteCourse = (courseToDelete) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => handleDeleteCourseCallback()} >Delete</AlertDialogAction>
+          <AlertDialogAction onClick={() => handleDeleteCourseCallback()} disabled={isDeleting} >
+            {isDeleting ? 'Deleting...' : 'Delete'}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
 

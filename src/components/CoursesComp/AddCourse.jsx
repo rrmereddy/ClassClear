@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { useAuth } from "@/utils/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
@@ -31,12 +30,11 @@ const schema = z.object({
   syllabus_text: z.string().optional(),
 });
 
-const AddCourse = () => {
+const AddCourse = ({ onAddCourse}) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState("Upload PDF");
   const [isProcessing, setIsProcessing] = useState(false); // New state to track processing
   const { toast } = useToast();
-  const { handleAddCourse } = useAuth();
 
   // Integrate react-hook-form and zod
   const {
@@ -75,7 +73,7 @@ const AddCourse = () => {
 
       console.log(courseData);
 
-      const result = await handleAddCourse(courseData);
+      const result = await onAddCourse(courseData);
       if (result.error) {
         toast({
           title: "Error",

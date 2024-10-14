@@ -11,7 +11,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
-function PaginatedCourses({ coursesPerPage }) {
+function PaginatedCourses({ coursesPerPage, refreshTrigger, onDeleteCourse }) {
     const [courses, setCourses] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const { getCourses } = useAuth();
@@ -27,7 +27,7 @@ function PaginatedCourses({ coursesPerPage }) {
         };
 
         fetchCourses();
-    }, [getCourses]);
+    }, [getCourses, refreshTrigger]);
 
     const totalPages = Math.ceil(courses.length / coursesPerPage);
     const currentCourses = courses.slice(
@@ -41,7 +41,7 @@ function PaginatedCourses({ coursesPerPage }) {
 
     return (
         <div className="flex flex-col items-center p-5 mt-10">
-            <CourseCardList courses={currentCourses} />
+            <CourseCardList courses={currentCourses} onDeleteCourse={onDeleteCourse} />
 
             {currentCourses.length > 0 ? (
                 <Pagination className={"ml-2"}>

@@ -1,6 +1,6 @@
 import DeleteCourse from "./DeleteCourse";
 
-function CourseCardList({ courses }) {
+function CourseCardList({ courses, onDeleteCourse }) {
     return (
         <div className="flex flex-wrap justify-between gap-4">
             {courses.map((course, index) => (
@@ -11,7 +11,7 @@ function CourseCardList({ courses }) {
                     <div className="mb-2 flex flex-col"> <span className="font-bold text-secondary_color">Course:</span> {course.course_name}</div>
                     <div className="mb-2 flex flex-col"><span className="font-bold text-secondary_color">University:</span> {course.university_name}</div>
                     <div className="mb-2 flex flex-col"><span className="font-bold text-secondary_color">Instructor:</span> {course.instructor_name}</div>
-                    <DeleteCourse course={course} />
+                    <DeleteCourse course={course} onDeleteCourse={onDeleteCourse} />
                 </div>
             ))}
         </div>
