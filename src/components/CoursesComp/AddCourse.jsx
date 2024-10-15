@@ -31,9 +31,9 @@ const schema = z.object({
 });
 
 const AddCourse = ({ onAddCourse}) => {
+  const [loading, setLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState("Upload PDF");
-  const [isProcessing, setIsProcessing] = useState(false); // New state to track processing
   const { toast } = useToast();
 
   // Integrate react-hook-form and zod
@@ -61,42 +61,40 @@ const AddCourse = ({ onAddCourse}) => {
       return;
     }
 
-    setIsProcessing(true); // Start processing
+    const courseData = {
+      ...rest,
+      syllabus_file: syllabus_file?.[0],
+      syllabus_text: syllabus_text.length > 0 ? syllabus_text : "",
+    };
+    const syllabus_data = new FormData();
+    syllabus_data.append("syllabus_file", courseData.syllabus_file);
+    syllabus_data.append("syllabus_text", courseData.syllabus_text);
 
-    // Simulate file upload completion after 5 seconds
-    setTimeout(async () => {
-      const courseData = {
-        ...rest,
-        syllabus_file: tabValue === "Upload PDF" ? syllabus_file?.[0] : null,
-        syllabus_text: tabValue === "Upload Text" ? syllabus_text : "",
-      };
-
-      console.log(courseData);
-
-      const result = await onAddCourse(courseData);
-      if (result.error) {
-        toast({
-          title: "Error",
-          variant: "destructive",
-          description: result.error,
-          status: "error",
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: result.success,
-          status: "success",
-          style: { borderColor: 'green' },
-        });
-        setIsDialogOpen(false);
-        reset();
-      }
-      setIsProcessing(false); // End processing
-    }, 5000);
+    setLoading(true);
+    const result = await onAddCourse(courseData, syllabus_data);
+    console.log(result);
+    if (result.error) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: result.error,
+        status: "error",
+      });
+      setLoading(false);
+    } else {
+      toast({
+        title: "Success",
+        description: result.success,
+        status: "success",
+        style: { borderColor: 'green' },
+      });
+      handleDialogClose();
+    }
   };
 
   const handleDialogClose = () => {
     reset();
+    setLoading(false);
     setIsDialogOpen(false);
   };
 
@@ -210,12 +208,11 @@ const AddCourse = ({ onAddCourse}) => {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Add Course</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Sending...' : 'Add Course'}
+            </Button>
           </DialogFooter>
         </form>
-
-        {/* Show the FileProcessing component when file is being processed */}
-        {isProcessing && <FileProcessing onComplete={() => setIsProcessing(false)} />}
         
       </DialogContent>
     </Dialog>

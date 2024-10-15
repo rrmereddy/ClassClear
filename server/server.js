@@ -12,12 +12,17 @@ import dotenv from "dotenv";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
+import OpenAI from "openai";
 import axios from "axios";
+import FormData from "form-data";
+import fs from "fs";
+
 
 dotenv.config();
 const app = express();
 const port = 5001;
 const saltRounds = 12;
+
 
 app.use(
   session({
@@ -37,6 +42,56 @@ const db = new pg.Client({
   password: process.env.PG_PASSWORD,
   port: process.env.PG_PORT,
 });
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
+
+const getGPTResponse = async (syllabusFile, syllabusText) => {
+    // Prepare data to send to GPT endpoint
+    let contentToProcess = "";
+    if (syllabusText) {
+      contentToProcess = syllabusText;
+    } else if (syllabusFile) {
+      const formData = new FormData();
+      formData.append("file", fs.createReadStream(syllabusFile));
+      contentToProcess = formData;
+    }
+  
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: [
+              {
+                type: "text",
+                text: "Extract important information from a syllabus, focusing on deadlines, grading policy, attendance, and any other relevant details.\n\n# Steps\n\n1. **Identify Main Categories:** Look for the sections in the syllabus that address different aspects, such as Homework, Exams, and Projects.\n2. **Extract Deadlines:** Within each category, identify any stated deadlines and ensure they are recorded accurately.\n3. **Grading Policy:** Locate the section that outlines how the course will be graded, and summarize the key points, including weightings for different components.\n4. **Attendance Policy:** Note any rules or guidelines regarding attendance, such as required presence, penalties for absences, or participation expectations.\n5. **Additional Important Information:** Look for any other details that might be important, such as office hours, course materials, or special instructions, and include them.\n\n# Output Format\n\nProvide the extracted information in a structured format similar to the following JSON example:\n```json\n{\n  \"Categories\": {\n    \"Homework\": {\n      \"Due Dates\": [\"YYYY-MM-DD\", ...]\n    },\n    \"Exams\": {\n      \"Due Dates\": [\"YYYY-MM-DD\", ...]\n    },\n    \"Projects\": {\n      \"Due Dates\": [\"YYYY-MM-DD\", ...]\n    }\n  },\n  \"Grading Policy\": {\n    \"Description\": \"Grades consist of 40% homework, 30% exams, and 30% projects.\"\n  },\n  \"Attendance Policy\": {\n    \"Description\": \"Attendance is mandatory with a minimum of 80% attendance required.\"\n  },\n  \"Additional Information\": {\n    \"Office Hours\": \"Details of when and where office hours will be held.\",\n    \"Course Materials\": \"Required or suggested materials.\",\n    \"Other Instructions\": \"Any other relevant information.\"\n  }\n}\n```"
+              },
+            ]
+          },
+          {
+            role: "user",
+            content: contentToProcess
+          }
+        ],
+        temperature: 1,
+        max_tokens: 2048,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        response_format: {
+          type: "text"
+        },
+      });
+  
+      return response.choices[0].message; // Assuming response is in message.content
+    } catch (err) {
+      console.error("Error processing syllabus: ", err);
+      throw new Error("Failed to get GPT response.");
+    }
+}
 
 db.connect();
 app.use(cookieParser());
@@ -306,6 +361,8 @@ app.get("/auth/google/redirect", (req, res, next) => {
   })(req, res, next);
 });
 
+app.post 
+
 app.post("/courses", verify, async (req, res) => {
   const { course_name, university_name, instructor_name, syllabus_file, syllabus_text } =
     req.body;
@@ -314,6 +371,7 @@ app.post("/courses", verify, async (req, res) => {
       req.user.email,
     ]);
 
+    const extractedData = await getGPTResponse(syllabus_file, syllabus_text);
     await db.query(
       "INSERT INTO syllabus_metadata (course_name, university_name, instructor_name, syllabus_file, user_id, syllabus_text) VALUES ($1, $2, $3, $4, $5, $6)",
       [
@@ -326,7 +384,10 @@ app.post("/courses", verify, async (req, res) => {
       ]
     );
 
-    res.status(200).send({ message: "Successfully added course!" });
+    res.status(200).send({ 
+      message: "Successfully added course!",
+      gptExtractedData: extractedData
+    });
   } catch (err) {
     res.status(400).send({ error: "Error ocurred" });
     console.error(err);

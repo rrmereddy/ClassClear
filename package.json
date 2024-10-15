@@ -45,6 +45,7 @@
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.417.0",
     "nodemon": "^3.1.4",
+    "openai": "^4.67.3",
     "passport": "^0.7.0",
     "passport-discord": "^0.1.4",
     "passport-google-oauth2": "^0.2.0",

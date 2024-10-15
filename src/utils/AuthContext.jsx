@@ -4,6 +4,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode"
 import { calculatePasswordStrength } from '../components/PasswordStrength';
 
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
@@ -141,11 +142,16 @@ export const AuthProvider = ({children}) => {
                     withCredentials: true,
                 }
             );
+
+            console.log(response);
     
             if (response.data.error) {
                 return { error: response.data.error };
             } else {
-                return { success: "Course Added!" };
+                return { 
+                    success: "Course Added!",
+                    data: response.data.gptExtractedData
+                 };
             }
     
         } catch (err) {
