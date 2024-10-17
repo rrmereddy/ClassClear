@@ -4,7 +4,7 @@ import AddDeadline from './DashBoardComp/AddDeadline';
 import Deadlines from './DashBoardComp/Deadlines';
 import DeleteDeadline from './DashBoardComp/DeleteDeadline';
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, RefreshCcw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 
@@ -48,6 +48,26 @@ function DeadlineManager({ count }) {
           },
         },
         {
+          accessorKey: "refreshTrigger",
+          header: () => {
+            return (
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="fixed right-1/6"
+                  onClick={refreshDeadlines}
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          },
+          cell: ({ row }) => {
+            return row.original.refreshTrigger;
+          }
+        },
+        {
           id: "actions",
           cell: ({ row }) => {
             return (
@@ -82,6 +102,7 @@ function DeadlineManager({ count }) {
     }, [handleAddDeadline, toast, refreshDeadlines]);
 
     const deleteDeadline = useCallback(async (course) => {
+        console.log(course)
         const response = await handleDeleteDeadline(course);
         if (response.success) {
             toast({

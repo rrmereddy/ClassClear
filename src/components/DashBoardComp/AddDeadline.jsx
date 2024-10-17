@@ -71,6 +71,7 @@ const AddDeadline = ({ onAddDeadline }) => {
       });
     }
     setIsDialogOpen(false);
+    handleDialogClose();
   }
   const handleDialogClose = () => {
     setDeadline({
@@ -87,6 +88,15 @@ const AddDeadline = ({ onAddDeadline }) => {
   const handleDeadlineChange = (e) => {
     setDeadline(prev=>({ ...prev, [e.target.name]: e.target.value }));
   }
+  const handleDateChange = (selectedDate) => {
+    setDate(selectedDate); // Update the date state
+    setDeadline(prev => ({
+      ...prev,
+      dueDate: selectedDate, // Also update the deadline's dueDate field
+    }));
+  };
+  
+
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={(open) => {
@@ -158,7 +168,7 @@ const AddDeadline = ({ onAddDeadline }) => {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={handleDateChange}
           initialFocus
         />
       </PopoverContent>

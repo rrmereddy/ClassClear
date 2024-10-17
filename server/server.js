@@ -16,6 +16,7 @@ import OpenAI from "openai";
 import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
+import { log } from "console";
 
 
 dotenv.config();
@@ -546,7 +547,8 @@ app.post("/deadlines", verify, async (req, res) => {
 });
 
 app.delete("/deletedeadline", verify, async (req, res) => {
-  const { category, course_name } = req.body;
+  const { category, course_name, due_date } = req.body;
+  const date = new Date(due_date).toISOString().split('T')[0];
   
   try {
     const user_id = await db.query("SELECT * FROM users WHERE email=$1", [
@@ -554,10 +556,11 @@ app.delete("/deletedeadline", verify, async (req, res) => {
     ]);
 
     await db.query(
-      "DELETE FROM deadlines WHERE course_name=$1 AND category=$2 AND user_id=$3",
+      "DELETE FROM deadlines WHERE course_name=$1 AND category=$2 AND due_date::date=$3 AND user_id=$4",
       [
         course_name,
         category,
+        date,
         user_id.rows[0].id,
       ]
     );

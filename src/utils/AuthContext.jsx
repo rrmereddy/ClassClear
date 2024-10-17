@@ -210,9 +210,9 @@ export const AuthProvider = ({children}) => {
 
     async function handleDeleteDeadline(deadlineData) {
         try {
-            const { course_name, category, dueDate } = deadlineData;
+            const { course_name, category, due_date } = deadlineData;
             const response = await axiosJWT.delete("http://localhost:5001/deletedeadline", {
-                data: { course_name, category, dueDate },
+                data: { course_name, category, due_date },
                 headers: {
                     authorization: "Bearer " + user.accessToken,
                 },
