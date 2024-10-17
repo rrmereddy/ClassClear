@@ -63,16 +63,16 @@ const getGPTResponse = async (syllabusFile, syllabusText) => {
         model: "gpt-4o-mini",
         messages: [
           {
-            role: "system",
-            content: [
+            "role": "system",
+            "content": [
               {
-                type: "text",
-                text: "Extract important information from a syllabus, focusing on deadlines, grading policy, attendance, and any other relevant details.\n\n# Steps\n\n1. **Identify Main Categories:** Look for the sections in the syllabus that address different aspects, such as Homework, Exams, and Projects.\n2. **Extract Deadlines:** Within each category, identify any stated deadlines and ensure they are recorded accurately.\n3. **Grading Policy:** Locate the section that outlines how the course will be graded, and summarize the key points, including weightings for different components.\n4. **Attendance Policy:** Note any rules or guidelines regarding attendance, such as required presence, penalties for absences, or participation expectations.\n5. **Additional Important Information:** Look for any other details that might be important, such as office hours, course materials, or special instructions, and include them.\n\n# Output Format\n\nProvide the extracted information in a structured format similar to the following JSON example:\n```json\n{\n  \"Categories\": {\n    \"Homework\": {\n      \"Due Dates\": [\"YYYY-MM-DD\", ...]\n    },\n    \"Exams\": {\n      \"Due Dates\": [\"YYYY-MM-DD\", ...]\n    },\n    \"Projects\": {\n      \"Due Dates\": [\"YYYY-MM-DD\", ...]\n    }\n  },\n  \"Grading Policy\": {\n    \"Description\": \"Grades consist of 40% homework, 30% exams, and 30% projects.\"\n  },\n  \"Attendance Policy\": {\n    \"Description\": \"Attendance is mandatory with a minimum of 80% attendance required.\"\n  },\n  \"Additional Information\": {\n    \"Office Hours\": \"Details of when and where office hours will be held.\",\n    \"Course Materials\": \"Required or suggested materials.\",\n    \"Other Instructions\": \"Any other relevant information.\"\n  }\n}\n```"
-              },
+                "type": "text",
+                "text": "Extract important information from a syllabus, focusing on deadlines, grading policy, attendance, and any other relevant details.\n\n# Steps\n\n1. **Identify Main Categories:** Look for the sections in the syllabus that address different aspects, such as Homework, Exams, and Projects.\n2. **Extract Deadlines:** Within each category, identify any stated deadlines and ensure they are recorded accurately.\n3. **Grading Policy:** Locate the section that outlines how the course will be graded, and summarize the key points, including weightings for different components.\n4. **Attendance Policy:** Note any rules or guidelines regarding attendance, such as required presence, penalties for absences, or participation expectations.\n5. **Additional Important Information:** Look for any other details that might be important, such as office hours, course materials, or special instructions, and include them.\n\n# Output Format\n\nProvide the extracted information in a structured format similar to the following JSON example:\n```json\n{\n  \"Course Name\": String, #This is Required and shorten the name as much as possible, get the course and the number\n  \"Instructor Name: String, \n  \"Categories\": {\n    \"Homework\": {\n      \"Due Dates\": [\"YYYY-MM-DD\", ...]\n    },\n    \"Exams\": {\n      \"Due Dates\": [\"YYYY-MM-DD\", ...]\n    },\n    \"Projects\": {\n      \"Due Dates\": [\"YYYY-MM-DD\", ...]\n    }\n  },\n  \"Grading Policy\": {\n    \"Description\": \"Summary of grading criteria and weightings.\"\n  },\n  \"Attendance Policy\": {\n    \"Description\": \"Summary of attendance requirements.\"\n  },\n  \"Additional Information\": {\n    \"Office Hours\": \"Details of when and where office hours will be held.\",\n    \"Course Materials\": \"Required or suggested materials.\",\n    \"Other Instructions\": \"Any other relevant information.\"\n  }\n}\n```\n\n# Examples\n\n**Input:** A syllabus document containing multiple sections with details on course structure, deadlines, and policies.\n\n**Output Example:**\n```json\n{\n  \"Course Name\": \"CSCE-221\", \n  \"Instructor Name\": \"Dr/ Leyk, \n  \"Categories\": {\n    \"Homework\": {\n      \"Due Dates\": [\"2024-02-01\", \"2024-03-15\"]\n    },\n    \"Exams\": {\n      \"Due Dates\": [\"2024-05-10\"]\n    },\n    \"Projects\": {\n      \"Due Dates\": [\"2024-04-20\"]\n    }\n  },\n  \"Grading Policy\": {\n    \"Description\": \"Grades consist of 40% homework, 30% exams, and 30% projects.\"\n  },\n  \"Attendance Policy\": {\n    \"Description\": \"Attendance is mandatory with a minimum of 80% attendance required.\"\n  },\n  \"Additional Information\": {\n    \"Office Hours\": \"MWF 1-2 PM at Room 203\",\n    \"Course Materials\": \"Textbook: Intermediate Algebra, 3rd Edition.\",\n    \"Other Instructions\": \"Submit assignments on the course portal.\"\n  }\n}\n```\n\n(Ensure that actual details in the JSON output are obtained from the given syllabus document. Make sure that fpr duedates only the date is being recorded as individual entries and no text is being shown)"
+              }
             ]
           },
           {
-            role: "user",
+            "role": "user",
             content: contentToProcess
           }
         ],
@@ -82,7 +82,7 @@ const getGPTResponse = async (syllabusFile, syllabusText) => {
         frequency_penalty: 0,
         presence_penalty: 0,
         response_format: {
-          type: "text"
+          type: "json_object"
         },
       });
   
@@ -361,7 +361,62 @@ app.get("/auth/google/redirect", (req, res, next) => {
   })(req, res, next);
 });
 
-app.post 
+async function getCourseDatesAndInsertSQL(syllabusData, userId) {
+  // Extract the course name
+  const courseName = syllabusData["Course Name"];
+  
+  // Extract relevant dates from the "Exams" category
+  const examDates = syllabusData["Categories"]["Exams"]["Due Dates"];
+  
+  // Loop through each date and insert into the PostgreSQL table
+  for (let date of examDates) {
+    const dueDate = `${date}`; // Adjust the time and timezone if needed
+    const category = 'Exam'; // In this case, it's an exam category
+
+    await db.query(
+      "INSERT INTO deadlines (course_name, category, due_date, user_id) VALUES ($1, $2, $3, $4)",
+      [courseName, category, dueDate, userId]
+    );
+  }
+
+  return `Inserted ${examDates.length} records into the database.`;
+}
+
+/*const extractedData = {
+  role: 'assistant',
+  content: '{\n' +
+    '  "Course Name": "CSCE-221", \n' +
+    '  "Instructor Name": "Dr. Teresa Leyk", \n' +
+    '  "Categories": {\n' +
+    '    "Homework": {\n' +
+    '      "Due Dates": []\n' +
+    '    },\n' +
+    '    "Exams": {\n' +
+    '      "Due Dates": ["2024-09-16", "2024-10-14", "2024-12-05", "2024-12-06", "2024-12-09"]\n' +
+    '    },\n' +
+    '    "Projects": {\n' +
+    '      "Due Dates": []\n' +
+    '    }\n' +
+    '  },\n' +
+    '  "Grading Policy": {\n' +
+    '    "Description": "Grades consist of 9% homework assignments, 27% programming assignments, 4% culture assignment, 15% quizzes, and 15% each for three exams."\n' +
+    '  },\n' +
+    '  "Attendance Policy": {\n' +
+    '    "Description": "Lecture attendance is required with participation through pop quizzes. Lab attendance is also required, with bonus points for perfect attendance."\n' +
+    '  },\n' +
+    '  "Additional Information": {\n' +
+    '    "Office Hours": "See course resources on Canvas for details.",\n' +     
+    '    "Course Materials": "Required Textbook: \'Data Structures and Algorithm Analysis in C++,\', 4th Edition, Mark A. Weiss.",\n' +
+    '    "Other Instructions": "Late homework accepted up to 1 day with a 5% penalty. Make-up exams/quizzes only with documented University-approved excuses."\n' +
+    '  }\n' +
+    '}',
+  refusal: null
+};
+ 
+// Insert Dates into SQL
+const parsed = JSON.parse(extractedData.content);
+console.log(parsed["Categories"]["Exams"]["Due Dates"]);*/
+
 
 app.post("/courses", verify, async (req, res) => {
   const { course_name, university_name, instructor_name, syllabus_file, syllabus_text } =
@@ -371,7 +426,14 @@ app.post("/courses", verify, async (req, res) => {
       req.user.email,
     ]);
 
-    const extractedData = await getGPTResponse(syllabus_file, syllabus_text);
+    // Get GPT Response
+    let extractedData = await getGPTResponse(syllabus_file, syllabus_text);
+    extractedData = JSON.parse(extractedData.content);
+    getCourseDatesAndInsertSQL(extractedData, user_id.rows[0].id)
+      .then(result => console.log(result))
+      .catch(error => console.error("Error inserting into database: ", error));
+
+
     await db.query(
       "INSERT INTO syllabus_metadata (course_name, university_name, instructor_name, syllabus_file, user_id, syllabus_text) VALUES ($1, $2, $3, $4, $5, $6)",
       [
