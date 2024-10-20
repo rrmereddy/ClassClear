@@ -12,7 +12,6 @@ const Dashboard = () => {
   const [desktop, setdesktop] = useState(false);
   useEffect(() => {
       if (window.innerWidth > 500) {
-        console.log(window.innerWidth); 
         setdesktop(true);
       } else {
         setdesktop(false);
@@ -33,7 +32,6 @@ const Dashboard = () => {
         const calculatedRows = Math.floor(elementWidth / cardWidth);
 
         setCoursesPerPage(calculatedRows);
-        console.log(coursesPerPage);
       }
     };
 
