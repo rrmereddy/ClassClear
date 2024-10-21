@@ -112,7 +112,7 @@ app.use(passport.session());
 
 const generateAccessToken = (user) => {
   return jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "30m",
+    expiresIn: "45m",
   });
 };
 

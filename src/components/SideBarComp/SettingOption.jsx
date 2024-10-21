@@ -26,11 +26,8 @@ const SettingOption = ({ open, onClose }) => {
             Make changes to your settings here. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <Label>
-            <span>Theme</span>
+        <div className="flex flex-col">
             <ModeToggle />
-          </Label>
         </div>
         <DialogFooter>
           <Button variant="destructive" onClick={handleLogOut}>
