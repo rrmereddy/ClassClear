@@ -16,7 +16,7 @@ import OpenAI from "openai";
 import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
-import { log } from "console";
+import process from "process";
 
 
 dotenv.config();
@@ -112,7 +112,7 @@ app.use(passport.session());
 
 const generateAccessToken = (user) => {
   return jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "5m",
+    expiresIn: "45m",
   });
 };
 
@@ -135,8 +135,6 @@ app.post("/api/refresh", async (req, res) => {
     if (data.rows.length === 0) {
       return res.status(403).json("Refresh token is not valid!");
     }
-
-    const user = data.rows[0];
 
     jwt.verify(
       refreshToken,
@@ -168,7 +166,7 @@ app.post("/api/refresh", async (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("local", (err, user) => {
     if (err) {
       return res
         .status(500)
@@ -258,7 +256,7 @@ const verify = (req, res, next) => {
   }
 };
 
-app.post("/logout", verify, async (req, res) => {
+app.post("/logout", verify, async (req) => {
   await db.query("UPDATE users SET refreshToken = $1 WHERE email = $2", [
     null,
     req.user.email,
@@ -290,7 +288,7 @@ app.get("/universitynames", async (req, res) => {
 app.get("/auth/discord", passport.authenticate("discord"));
 
 app.get("/auth/discord/redirect", (req, res, next) => {
-  passport.authenticate("discord", (err, user, info) => {
+  passport.authenticate("discord", (err, user) => {
     if (err || !user) {
       res.send(`
         <script>
@@ -330,7 +328,7 @@ app.get(
 );
 
 app.get("/auth/google/redirect", (req, res, next) => {
-  passport.authenticate("google", (err, user, info) => {
+  passport.authenticate("google", (err, user) => {
     if (err || !user) {
       res.send(`
         <script>
@@ -366,61 +364,68 @@ async function getCourseDatesAndInsertSQL(syllabusData, userId) {
   // Extract the course name
   const courseName = syllabusData["Course Name"];
   
-  // Extract relevant dates from the "Exams" category
-  const examDates = syllabusData["Categories"]["Exams"]["Due Dates"];
+  // Define the categories to check
+  const categories = ["Homework", "Exams", "Projects"];
   
-  // Loop through each date and insert into the PostgreSQL table
-  for (let date of examDates) {
-    const dueDate = `${date}`; // Adjust the time and timezone if needed
-    const category = 'Exam'; // In this case, it's an exam category
-
-    await db.query(
-      "INSERT INTO deadlines (course_name, category, due_date, user_id) VALUES ($1, $2, $3, $4)",
-      [courseName, category, dueDate, userId]
-    );
+  // Loop through each category
+  for (let category of categories) {
+    // Get the due dates for the current category
+    const dueDates = syllabusData["Categories"][category]["Due Dates"];
+    
+    // Skip if there are no due dates
+    if (!dueDates || dueDates.length === 0) continue;
+    
+    // Loop through each date and insert into the PostgreSQL table
+    for (let date of dueDates) {
+      const dueDate = `${date}`; // Adjust the time and timezone if needed
+      
+      await db.query(
+        "INSERT INTO deadlines (course_name, category, due_date, user_id) VALUES ($1, $2, $3, $4)",
+        [courseName, category, dueDate, userId]
+      );
+    }
   }
 
-  return `Inserted ${examDates.length} records into the database.`;
+  return `Inserted records for all categories with due dates into the database.`;
 }
 
-/*const extractedData = {
-  role: 'assistant',
-  content: '{\n' +
-    '  "Course Name": "CSCE-221", \n' +
-    '  "Instructor Name": "Dr. Teresa Leyk", \n' +
-    '  "Categories": {\n' +
-    '    "Homework": {\n' +
-    '      "Due Dates": []\n' +
-    '    },\n' +
-    '    "Exams": {\n' +
-    '      "Due Dates": ["2024-09-16", "2024-10-14", "2024-12-05", "2024-12-06", "2024-12-09"]\n' +
-    '    },\n' +
-    '    "Projects": {\n' +
-    '      "Due Dates": []\n' +
-    '    }\n' +
-    '  },\n' +
-    '  "Grading Policy": {\n' +
-    '    "Description": "Grades consist of 9% homework assignments, 27% programming assignments, 4% culture assignment, 15% quizzes, and 15% each for three exams."\n' +
-    '  },\n' +
-    '  "Attendance Policy": {\n' +
-    '    "Description": "Lecture attendance is required with participation through pop quizzes. Lab attendance is also required, with bonus points for perfect attendance."\n' +
-    '  },\n' +
-    '  "Additional Information": {\n' +
-    '    "Office Hours": "See course resources on Canvas for details.",\n' +     
-    '    "Course Materials": "Required Textbook: \'Data Structures and Algorithm Analysis in C++,\', 4th Edition, Mark A. Weiss.",\n' +
-    '    "Other Instructions": "Late homework accepted up to 1 day with a 5% penalty. Make-up exams/quizzes only with documented University-approved excuses."\n' +
-    '  }\n' +
-    '}',
-  refusal: null
-};
- 
-// Insert Dates into SQL
-const parsed = JSON.parse(extractedData.content);
-console.log(parsed["Categories"]["Exams"]["Due Dates"]);*/
+async function getCourseInfoAndInsertSQL(syllabusData, university_name, userId) {
+  const course_name = syllabusData["Course Name"];
+  const instructor_name = syllabusData["Instructor Name"];
+
+  const gradingPolicy = syllabusData["Grading Policy"]?.Description || '';
+
+  const attendancePolicy = syllabusData["Attendance Policy"]?.Description || '';
+
+  // Extract the additional information as a JSON object
+  const additionalInfo = {
+    "Office Hours": syllabusData["Additional Information"]?.["Office Hours"] || '',
+    "Course Materials": syllabusData["Additional Information"]?.["Course Materials"] || '',
+    "Other Instructions": syllabusData["Additional Information"]?.["Other Instructions"] || ''
+  };
+
+  // Insert into PostgreSQL
+  await db.query(
+    `INSERT INTO syllabus_metadata (course_name, university_name, instructor_name, user_id, grading_policy, attendance_policy, additional_info) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [
+      course_name, 
+      university_name,
+      instructor_name,
+      userId, 
+      gradingPolicy, 
+      attendancePolicy, 
+      JSON.stringify(additionalInfo), 
+    ]
+  );
+
+  return `Inserted course details for ${course_name}.`;
+}
+
 
 
 app.post("/courses", verify, async (req, res) => {
-  const { course_name, university_name, instructor_name, syllabus_file, syllabus_text } =
+  const { university_name, syllabus_file, syllabus_text } =
     req.body;
   try {
     const user_id = await db.query("SELECT * FROM users where email=$1", [
@@ -430,26 +435,18 @@ app.post("/courses", verify, async (req, res) => {
     // Get GPT Response
     let extractedData = await getGPTResponse(syllabus_file, syllabus_text);
     extractedData = JSON.parse(extractedData.content);
+    console.log(extractedData);
+
     getCourseDatesAndInsertSQL(extractedData, user_id.rows[0].id)
       .then(result => console.log(result))
       .catch(error => console.error("Error inserting into database: ", error));
 
-
-    await db.query(
-      "INSERT INTO syllabus_metadata (course_name, university_name, instructor_name, syllabus_file, user_id, syllabus_text) VALUES ($1, $2, $3, $4, $5, $6)",
-      [
-        course_name,
-        university_name,
-        instructor_name,
-        syllabus_file,
-        user_id.rows[0].id,
-        syllabus_text,
-      ]
-    );
+    getCourseInfoAndInsertSQL(extractedData, university_name, user_id.rows[0].id)
+      .then(result => console.log(result))
+      .catch(error => console.error("Error inserting into database: ", error));
 
     res.status(200).send({ 
       message: "Successfully added course!",
-      gptExtractedData: extractedData
     });
   } catch (err) {
     res.status(400).send({ error: "Error ocurred" });
@@ -465,7 +462,7 @@ app.post("/getcourses", verify, async (req, res) => {
     let user_id = await db.query("SELECT * FROM users WHERE email=$1", [email]);
     user_id = user_id.rows[0].id;
     let course_info = await db.query(
-      "SELECT course_name, university_name, instructor_name, syllabus_file, syllabus_text FROM syllabus_metadata WHERE user_id=$1",
+      "SELECT course_name, university_name, instructor_name, grading_policy, attendance_policy, additional_info FROM syllabus_metadata WHERE user_id=$1",
       [user_id]
     );
 
@@ -554,6 +551,7 @@ app.delete("/deletedeadline", verify, async (req, res) => {
     const user_id = await db.query("SELECT * FROM users WHERE email=$1", [
       req.user.email,
     ]);
+    console.log(course_name, category, date, user_id.rows[0].id)
 
     await db.query(
       "DELETE FROM deadlines WHERE course_name=$1 AND category=$2 AND due_date::date=$3 AND user_id=$4",
@@ -674,7 +672,7 @@ passport.use(
           const accessToken = generateAccessToken({ email: profile.email });
           const refreshToken = generateRefreshToken({ email: profile.email });
 
-          const newUser = await db.query(
+          let newUser = await db.query(
             "INSERT INTO users (email, password, refresh_token) VALUES ($1, $2, $3) RETURNING *",
             [profile.email, process.env.GOOGLE_FILLER_PASSWORD, refreshToken]
           );
