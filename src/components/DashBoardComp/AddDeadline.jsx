@@ -38,15 +38,15 @@ const AddDeadline = ({ onAddDeadline }) => {
     category: '',
     dueDate: new Date(),
   });
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date(2025, 6, 25));
 
   const { toast } = useToast();
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setDeadline(prev=>({ ...prev, dueDate: date }));
+    const payload = { ...deadline, dueDate: date };
     
-    if(!deadline.courseName || !deadline.category || !deadline.dueDate) {
+    if (!payload.courseName || !payload.category || !payload.dueDate) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -56,7 +56,7 @@ const AddDeadline = ({ onAddDeadline }) => {
       return;
     }
 
-    const result = await onAddDeadline(deadline);
+    const result = await onAddDeadline(payload);
     if (result.error) {
       toast({
         title: "Error",
@@ -74,13 +74,9 @@ const AddDeadline = ({ onAddDeadline }) => {
     handleDialogClose();
   }
   const handleDialogClose = () => {
-    setDeadline({
-      courseName: '',
-      category: '',
-      dueDate: '',
-    });
-    setDate(new Date());
-  }
+  setDeadline({ courseName: "", category: "", dueDate: new Date() });
+  setDate(new Date());
+};
 
   const handleCategoryChange = (value) => {
     setDeadline((prev) => ({ ...prev, category: value }));
@@ -133,7 +129,7 @@ const AddDeadline = ({ onAddDeadline }) => {
               <Label htmlFor="category" className="text-right">
                 Category
               </Label>
-                  <Select onValueChange={handleCategoryChange}>
+                  <Select value={deadline.category} onValueChange={handleCategoryChange}>
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select a Category" />
                     </SelectTrigger>
@@ -166,11 +162,12 @@ const AddDeadline = ({ onAddDeadline }) => {
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <Calendar
-          mode="single"
-          selected={date}
-          onSelect={handleDateChange}
-          initialFocus
-        />
+      mode="single"
+      defaultMonth={date}
+      selected={date}
+      onSelect={handleDateChange}
+      className="rounded-lg border shadow-sm"
+    />
       </PopoverContent>
     </Popover>
             </div>
