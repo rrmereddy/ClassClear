@@ -212,8 +212,8 @@ app.post("/signup", async (req, res) => {
           const refreshToken = generateRefreshToken({ email });
           const accessToken = generateAccessToken({ email });
           const user = await db.query(
-            "INSERT INTO users (email, password, refresh_token) VALUES ($1, $2, $3) RETURNING *",
-            [email, hash, refreshToken]
+            "INSERT INTO users (id, email, password, refresh_token) VALUES ($1, $2, $3, $4) RETURNING *",
+            [0, email, hash, refreshToken]
           );
           req.login(user.rows[0], (err) => {
             if (err) {
@@ -406,9 +406,10 @@ async function getCourseInfoAndInsertSQL(syllabusData, university_name, userId) 
 
   // Insert into PostgreSQL
   await db.query(
-    `INSERT INTO syllabus_metadata (course_name, university_name, instructor_name, user_id, grading_policy, attendance_policy, additional_info) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    `INSERT INTO syllabus_metadata (id, course_name, university_name, instructor_name, user_id, grading_policy, attendance_policy, additional_info) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
     [
+      0,
       course_name, 
       university_name,
       instructor_name,

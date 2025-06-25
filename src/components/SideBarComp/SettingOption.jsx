@@ -10,13 +10,19 @@ import {
 import { ModeToggle } from "../mode-toggle"
 import { LogOut } from "lucide-react"
 import { Label } from "@/components/ui/label"
+import { useAuth } from "@/utils/AuthContext"
 
-const handleLogOut = () => {
-  // Your logout logic here
-  console.log("Logging out")
-}
 
 const SettingOption = ({ open, onClose }) => {
+  const { user, logoutUser } = useAuth()
+  const handleLogOut = () => {
+    // Your logout logic here
+    console.log("Logging out")
+    logoutUser()
+  
+  
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">

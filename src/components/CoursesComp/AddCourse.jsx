@@ -18,7 +18,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload, FileText } from "lucide-react";
-import FileProcessing from '../FileProcessing'; // Import the new component
 import './CoursesComp.css';
 
 // Define the schema for validation using zod

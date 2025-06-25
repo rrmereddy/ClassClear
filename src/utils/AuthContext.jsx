@@ -37,6 +37,8 @@ export const AuthProvider = ({children}) => {
 
     const logoutUser = () => {
         //TODO: Implement logout functionality for user
+        setUser(null);
+        navigate('/login');
     }
 
     const refreshToken = async () => {
